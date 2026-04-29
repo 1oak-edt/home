@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>1Oak Lending — Capital Solutions Redefined</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Quattrocento:wght@400;700&family=Barlow+Condensed:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Fragment+Mono&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── Tokens ─────────────────────────────────────────────── */
+    :root {
+      --forest:      #232c17;
+      --forest-deep: #191f10;
+      --forest-mid:  #2e3b1d;
+      --forest-muted:rgba(35,44,23,0.06);
+      --tan:         #e4c386;
+      --tan-light:   #edd9a3;
+      --tan-dim:     rgba(228,195,134,0.18);
+      --tan-border:  rgba(228,195,134,0.30);
+      --cream:       #fafaf8;
+      --cream-dark:  #f3f0eb;
+      --white:       #ffffff;
+      --text:        #1c2211;
+      --text-muted:  #5a6350;
+      --text-faint:  #9aaa88;
+      --border:      #e0ddd6;
+      --rule:        rgba(35,44,23,0.10);
+    }
+
+    /* ── Reset ──────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Barlow', sans-serif;
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--text);
+      background: var(--cream);
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    /* ── Utility ────────────────────────────────────────────── */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 48px;
+    }
+    .eyebrow {
+      font-family: 'Fragment Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--tan);
+      display: block;
+      margin-bottom: 20px;
+    }
+    .eyebrow-dark { color: var(--text-muted); }
+    .section-rule {
+      width: 100%;
+      height: 1px;
+      background: var(--rule);
+      margin-bottom: 56px;
+    }
+
+    /* ── NAV ────────────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      inset: 0 0 auto 0;
+      z-index: 200;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      background: rgba(250,250,248,0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--rule);
+      transition: box-shadow 0.3s;
+    }
+    nav.scrolled { box-shadow: 0 2px 24px rgba(35,44,23,0.08); }
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 48px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      font-family: 'Quattrocento', serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--forest);
+      letter-spacing: -0.01em;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-family: 'Barlow', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--forest); }
+    .nav-cta {
+      background: var(--forest);
+      color: var(--cream) !important;
+      padding: 9px 22px;
+      border-radius: 100px;
+      font-size: 13px !important;
+      font-weight: 500 !important;
+      letter-spacing: 0.03em !important;
+      transition: background 0.2s !important;
+    }
+    .nav-cta:hover { background: var(--forest-mid) !important; color: var(--tan-light) !important; }
+
+    /* ── HERO ───────────────────────────────────────────────── */
+    #hero {
+      min-height: 100vh;
+      background: var(--forest-deep);
+      display: grid;
+      grid-template-rows: 1fr auto;
+      padding-top: 64px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Subtle noise texture overlay */
+    #hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    /* Large background lettermark */
+    #hero::after {
+      content: '1Oak';
+      position: absolute;
+      bottom: -40px;
+      right: -20px;
+      font-family: 'Quattrocento', serif;
+      font-size: clamp(180px, 22vw, 340px);
+      font-weight: 700;
+      color: rgba(255,255,255,0.025);
+      line-height: 1;
+      letter-spacing: -0.04em;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .hero-body {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 80px 48px 72px;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Fragment Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--tan);
+      margin-bottom: 32px;
+    }
+    .hero-tag::before {
+      content: '';
+      display: block;
+      width: 28px;
+      height: 1px;
+      background: var(--tan);
+    }
+
+    .hero-h1 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(64px, 9vw, 128px);
+      font-weight: 300;
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+      color: var(--cream);
+      max-width: 900px;
+    }
+    .hero-h1 em {
+      font-style: italic;
+      color: var(--tan);
+    }
+
+    .hero-bottom {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: end;
+      margin-top: 56px;
+      padding-top: 40px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: 48px;
+      padding-right: 48px;
+      padding-bottom: 56px;
+    }
+
+    .hero-desc {
+      font-family: 'Barlow', sans-serif;
+      font-size: 16px;
+      font-weight: 300;
+      color: rgba(250,250,248,0.5);
+      line-height: 1.75;
+      max-width: 480px;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 16px;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--tan);
+      color: var(--forest-deep);
+      font-family: 'Barlow', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 14px 28px;
+      border-radius: 100px;
+      transition: background 0.2s, transform 0.15s;
+      white-space: nowrap;
+    }
+    .btn-primary:hover { background: var(--tan-light); transform: translateY(-1px); }
+
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(255,255,255,0.18);
+      color: rgba(250,250,248,0.65);
+      font-family: 'Barlow', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 14px 28px;
+      border-radius: 100px;
+      transition: border-color 0.2s, color 0.2s;
+      white-space: nowrap;
+    }
+    .btn-outline:hover { border-color: var(--tan-border); color: var(--tan-light); }
+
+    /* ── STATS TICKER ───────────────────────────────────────── */
+    .stats-bar {
+      background: var(--tan);
+      overflow: hidden;
+      height: 44px;
+      display: flex;
+      align-items: center;
+    }
+    .stats-track {
+      display: flex;
+      gap: 0;
+      animation: ticker 30s linear infinite;
+      white-space: nowrap;
+    }
+    @keyframes ticker {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .stats-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 36px;
+      font-family: 'Fragment Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--forest-deep);
+      border-right: 1px solid rgba(35,44,23,0.2);
+    }
+    .stats-item .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--forest); flex-shrink: 0; }
+
+    /* ── ABOUT ──────────────────────────────────────────────── */
+    #about {
+      background: var(--cream);
+      padding: 110px 0;
+    }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 5fr 7fr;
+      gap: 80px;
+      align-items: start;
+    }
+    .about-sticky {
+      position: sticky;
+      top: 88px;
+    }
+    .about-sticky h2 {
+      font-family: 'Quattrocento', serif;
+      font-size: clamp(36px, 3.5vw, 52px);
+      font-weight: 700;
+      color: var(--forest);
+      line-height: 1.15;
+    }
+    .about-sticky p {
+      margin-top: 24px;
+      font-size: 15px;
+      font-weight: 300;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+    .about-sticky blockquote {
+      margin-top: 36px;
+      padding: 24px 28px;
+      background: var(--forest);
+      border-left: 3px solid var(--tan);
+    }
+    .about-sticky blockquote p {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 20px;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--cream);
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    .pillars { display: flex; flex-direction: column; }
+    .pillar {
+      padding: 36px 0;
+      border-bottom: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    .pillar:first-child { border-top: 1px solid var(--border); }
+    .pillar-num {
+      font-family: 'Fragment Mono', monospace;
+      font-size: 12px;
+      color: var(--text-faint);
+      padding-top: 4px;
+    }
+    .pillar-content h4 {
+      font-family: 'Quattrocento', serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--forest);
+      margin-bottom: 10px;
+    }
+    .pillar-content p {
+      font-size: 14px;
+      font-weight: 300;
+      color: var(--text-muted);
+      line-height: 1.75;
+    }
+
+    /* ── PROGRAMS ───────────────────────────────────────────── */
+    #programs {
+      background: var(--forest);
+      padding: 110px 0;
+    }
+    .programs-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: end;
+      margin-bottom: 64px;
+    }
+    .programs-header h2 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(44px, 5vw, 72px);
+      font-weight: 300;
+      color: var(--cream);
+      line-height: 1.0;
+      letter-spacing: -0.01em;
+    }
+    .programs-header p {
+      font-size: 15px;
+      font-weight: 300;
+      color: rgba(250,250,248,0.5);
+      line-height: 1.8;
+    }
+
+    .programs-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      background: rgba(255,255,255,0.06);
+    }
+
+    .prog-card {
+      background: var(--forest-deep);
+      padding: 44px 36px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      transition: background 0.25s;
+      cursor: default;
+    }
+    .prog-card:hover { background: var(--forest-mid); }
+    .prog-card.highlight {
+      background: var(--tan);
+    }
+    .prog-card.highlight:hover { background: var(--tan-light); }
+
+    .prog-tag {
+      font-family: 'Fragment Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--tan);
+      margin-bottom: 20px;
+    }
+    .prog-card.highlight .prog-tag { color: var(--forest); opacity: 0.65; }
+
+    .prog-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 38px;
+      font-weight: 400;
+      line-height: 1.0;
+      color: var(--cream);
+      margin-bottom: 18px;
+      letter-spacing: -0.01em;
+    }
+    .prog-card.highlight .prog-name { color: var(--forest-deep); }
+
+    .prog-desc {
+      font-size: 13.5px;
+      font-weight: 300;
+      color: rgba(250,250,248,0.45);
+      line-height: 1.75;
+      margin-bottom: 36px;
+      flex-grow: 1;
+    }
+    .prog-card.highlight .prog-desc { color: rgba(25,31,16,0.65); }
+
+    .prog-terms {
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .prog-card.highlight .prog-terms { border-color: rgba(35,44,23,0.15); }
+
+    .term-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      gap: 16px;
+    }
+    .prog-card.highlight .term-row { border-color: rgba(35,44,23,0.1); }
+    .term-row:last-child { border-bottom: none; }
+
+    .tl {
+      font-family: 'Fragment Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(250,250,248,0.35);
+    }
+    .prog-card.highlight .tl { color: rgba(25,31,16,0.45); }
+
+    .tv {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--cream);
+      text-align: right;
+    }
+    .prog-card.highlight .tv { color: var(--forest-deep); }
+
+    .prog-note {
+      margin-top: 20px;
+      font-size: 11.5px;
+      color: rgba(250,250,248,0.25);
+      line-height: 1.65;
+      font-style: italic;
+    }
+    .prog-card.highlight .prog-note { color: rgba(25,31,16,0.4); }
+
+    /* ── PROCESS ────────────────────────────────────────────── */
+    #process {
+      background: var(--cream-dark);
+      padding: 110px 0;
+    }
+    .process-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: end;
+      margin-bottom: 72px;
+    }
+    .process-header h2 {
+      font-family: 'Quattrocento', serif;
+      font-size: clamp(36px, 4vw, 54px);
+      font-weight: 700;
+      color: var(--forest);
+      line-height: 1.1;
+    }
+    .process-header p {
+      font-size: 15px;
+      font-weight: 300;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+
+    .process-steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      position: relative;
+    }
+
+    /* Connecting line */
+    .process-steps::before {
+      content: '';
+      position: absolute;
+      top: 22px;
+      left: calc(22px + 1px);
+      right: calc(22px + 1px);
+      height: 1px;
+      background: linear-gradient(to right, var(--forest) 0%, rgba(35,44,23,0.15) 100%);
+      z-index: 0;
+    }
+
+    .step {
+      padding: 0 32px 0 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .step-circle {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--forest);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Fragment Mono', monospace;
+      font-size: 11px;
+      color: var(--tan);
+      margin-bottom: 28px;
+      flex-shrink: 0;
+    }
+    .step:nth-child(2) .step-circle { background: var(--forest-mid); }
+    .step:nth-child(3) .step-circle { background: rgba(35,44,23,0.6); }
+    .step:nth-child(4) .step-circle { background: rgba(35,44,23,0.35); color: var(--text-muted); }
+
+    .step h4 {
+      font-family: 'Quattrocento', serif;
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--forest);
+      margin-bottom: 10px;
+    }
+    .step p {
+      font-size: 13.5px;
+      font-weight: 300;
+      color: var(--text-muted);
+      line-height: 1.75;
+    }
+    .step-time {
+      display: inline-block;
+      margin-top: 14px;
+      font-family: 'Fragment Mono', monospace;
+      font-size: 10px;
+      color: var(--tan);
+      letter-spacing: 0.08em;
+    }
+
+    /* ── GEOGRAPHY ──────────────────────────────────────────── */
+    #geography {
+      background: var(--forest);
+      padding: 110px 0;
+    }
+    .geo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+    .geo-left h2 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(44px, 5vw, 68px);
+      font-weight: 300;
+      color: var(--cream);
+      line-height: 1.0;
+      margin-bottom: 20px;
+    }
+    .geo-left p {
+      font-size: 15px;
+      font-weight: 300;
+      color: rgba(250,250,248,0.45);
+      line-height: 1.8;
+      margin-bottom: 36px;
+    }
+    .state-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+    }
+    .state-chip {
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 8px 6px;
+      text-align: center;
+      font-family: 'Fragment Mono', monospace;
+      font-size: 11px;
+      color: rgba(250,250,248,0.5);
+      letter-spacing: 0.08em;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+      cursor: default;
+    }
+    .state-chip:hover { border-color: var(--tan); color: var(--tan); background: var(--tan-dim); }
+
+    .geo-deals {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      background: rgba(255,255,255,0.05);
+    }
+    .deal-tile {
+      background: var(--forest-deep);
+      padding: 28px 24px;
+      transition: background 0.2s;
+    }
+    .deal-tile:hover { background: var(--forest-mid); }
+    .deal-amount {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 32px;
+      font-weight: 400;
+      color: var(--cream);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .deal-desc {
+      font-size: 12.5px;
+      font-weight: 300;
+      color: rgba(250,250,248,0.45);
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+    .deal-type {
+      font-family: 'Fragment Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--tan);
+    }
+
+    /* ── TEAM ───────────────────────────────────────────────── */
+    #team {
+      background: var(--cream);
+      padding: 110px 0;
+    }
+    .team-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: end;
+      margin-bottom: 64px;
+    }
+    .team-header h2 {
+      font-family: 'Quattrocento', serif;
+      font-size: clamp(36px, 4vw, 54px);
+      font-weight: 700;
+      color: var(--forest);
+      line-height: 1.1;
+    }
+    .team-header p {
+      font-size: 15px;
+      font-weight: 300;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+      background: var(--border);
+    }
+    .team-card {
+      background: var(--cream);
+      padding: 36px 28px;
+      transition: background 0.2s;
+    }
+    .team-card:hover { background: var(--white); }
+
+    .tc-mono {
+      width: 48px;
+      height: 48px;
+      background: var(--forest);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Quattrocento', serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--tan);
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+    .tc-name {
+      font-family: 'Quattrocento', serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--forest);
+      margin-bottom: 4px;
+    }
+    .tc-title {
+      font-family: 'Fragment Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--tan);
+      margin-bottom: 18px;
+      /* tan on light bg needs slight darkening */
+      color: #a07830;
+    }
+    .tc-bio {
+      font-size: 13px;
+      font-weight: 300;
+      color: var(--text-muted);
+      line-height: 1.75;
+    }
+
+    /* ── SUBMIT ─────────────────────────────────────────────── */
+    #submit {
+      background: var(--forest-deep);
+      padding: 110px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    #submit::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(228,195,134,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .submit-grid {
+      display: grid;
+      grid-template-columns: 5fr 7fr;
+      gap: 80px;
+      align-items: start;
+      position: relative;
+      z-index: 1;
+    }
+    .submit-left {
+      position: sticky;
+      top: 88px;
+    }
+    .submit-left h2 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(48px, 5.5vw, 80px);
+      font-weight: 300;
+      color: var(--cream);
+      line-height: 1.0;
+      letter-spacing: -0.01em;
+      margin-bottom: 24px;
+    }
+    .submit-left h2 em { font-style: italic; color: var(--tan); }
+    .submit-left p {
+      font-size: 15px;
+      font-weight: 300;
+      color: rgba(250,250,248,0.45);
+      line-height: 1.8;
+      margin-bottom: 12px;
+    }
+    .submit-left .contact-direct {
+      margin-top: 32px;
+      padding-top: 32px;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .contact-line {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .contact-line-label {
+      font-family: 'Fragment Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(250,250,248,0.3);
+    }
+    .contact-line-val {
+      font-size: 15px;
+      font-weight: 400;
+      color: rgba(250,250,248,0.7);
+      transition: color 0.2s;
+    }
+    .contact-line-val:hover { color: var(--tan); }
+
+    /* Form */
+    .form-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .form-row.single { grid-template-columns: 1fr; }
+    .fg {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .fg label {
+      font-family: 'Fragment Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(250,250,248,0.3);
+    }
+    .fg input,
+    .fg select,
+    .fg textarea {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 4px;
+      color: var(--cream);
+      font-family: 'Barlow', sans-serif;
+      font-size: 14px;
+      font-weight: 300;
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+      width: 100%;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .fg select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23e4c386' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+      cursor: pointer;
+    }
+    .fg select option { background: #191f10; color: var(--cream); }
+    .fg input:focus,
+    .fg select:focus,
+    .fg textarea:focus {
+      border-color: rgba(228,195,134,0.45);
+      background: rgba(228,195,134,0.04);
+    }
+    .fg input::placeholder,
+    .fg textarea::placeholder { color: rgba(250,250,248,0.18); }
+    .fg textarea { resize: vertical; min-height: 100px; }
+
+    .form-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+    .form-disclaimer {
+      font-size: 11.5px;
+      font-weight: 300;
+      color: rgba(250,250,248,0.22);
+      max-width: 380px;
+      line-height: 1.6;
+    }
+    .btn-submit {
+      background: var(--tan);
+      color: var(--forest-deep);
+      font-family: 'Barlow', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 14px 32px;
+      border-radius: 100px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-submit:hover { background: var(--tan-light); transform: translateY(-1px); }
+
+    /* ── FOOTER ─────────────────────────────────────────────── */
+    footer {
+      background: var(--forest);
+      padding: 64px 0 40px;
+    }
+    .footer-top {
+      display: grid;
+      grid-template-columns: 2.5fr 1fr 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 56px;
+    }
+    .footer-brand .footer-logo {
+      font-family: 'Quattrocento', serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--cream);
+      margin-bottom: 16px;
+    }
+    .footer-brand p {
+      font-size: 13px;
+      font-weight: 300;
+      color: rgba(250,250,248,0.35);
+      line-height: 1.75;
+      max-width: 280px;
+    }
+    .footer-col h5 {
+      font-family: 'Fragment Mono', monospace;
+      font-size: 9.5px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--tan);
+      margin-bottom: 20px;
+      /* Darken slightly for legibility on green bg */
+      opacity: 0.75;
+    }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-col ul a {
+      font-size: 13.5px;
+      font-weight: 300;
+      color: rgba(250,250,248,0.4);
+      transition: color 0.2s;
+    }
+    .footer-col ul a:hover { color: var(--cream); }
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .footer-bottom p {
+      font-family: 'Fragment Mono', monospace;
+      font-size: 10.5px;
+      color: rgba(250,250,248,0.2);
+      letter-spacing: 0.04em;
+    }
+    .footer-tagline {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 14px;
+      font-style: italic;
+      font-weight: 300;
+      color: rgba(250,250,248,0.25);
+    }
+
+    /* ── RESPONSIVE ─────────────────────────────────────────── */
+    @media (max-width: 1024px) {
+      .container { padding: 0 32px; }
+      .nav-inner { padding: 0 32px; }
+      .hero-body { padding: 60px 32px 56px; }
+      .hero-bottom { padding: 32px 32px 48px; }
+
+      .about-grid,
+      .programs-header,
+      .process-header,
+      .geo-grid,
+      .team-header,
+      .submit-grid,
+      .footer-top { grid-template-columns: 1fr; gap: 40px; }
+
+      .about-sticky,
+      .submit-left { position: static; }
+
+      .programs-cards { grid-template-columns: 1fr; }
+      .process-steps { grid-template-columns: 1fr 1fr; gap: 40px; }
+      .process-steps::before { display: none; }
+      .team-grid { grid-template-columns: 1fr 1fr; }
+      .geo-deals { grid-template-columns: 1fr 1fr; }
+      .footer-top { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .container { padding: 0 20px; }
+      .nav-inner { padding: 0 20px; }
+      .nav-links { display: none; }
+      .hero-body { padding: 40px 20px 40px; }
+      .hero-bottom { grid-template-columns: 1fr; padding: 28px 20px 36px; }
+      .hero-actions { justify-content: flex-start; }
+      .state-grid { grid-template-columns: repeat(5, 1fr); }
+      .team-grid { grid-template-columns: 1fr; }
+      .geo-deals { grid-template-columns: 1fr; }
+      .process-steps { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .footer-top { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ──────────────────────────────────────────────────── -->
+<nav id="nav">
+  <div class="nav-inner">
+    <a href="#hero" class="nav-logo">1Oak Lending</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#programs">Programs</a></li>
+      <li><a href="#process">Process</a></li>
+      <li><a href="#team">Team</a></li>
+      <li><a href="#submit" class="nav-cta">Submit a Deal</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ── HERO ─────────────────────────────────────────────────── -->
+<section id="hero">
+  <div class="hero-body">
+    <div class="hero-tag">Private Credit &nbsp;·&nbsp; Commercial Real Estate &nbsp;·&nbsp; Bridge Financing</div>
+    <h1 class="hero-h1">Capital<br>Solutions<br><em>Redefined</em></h1>
+  </div>
+  <div class="hero-bottom">
+    <p class="hero-desc">
+      A family-office-backed private lender providing flexible, senior-secured bridge and transitional financing to CRE owners, operators, and developers nationwide.
+    </p>
+    <div class="hero-actions">
+      <a href="#submit" class="btn-primary">Submit a Deal →</a>
+      <a href="#programs" class="btn-outline">View Programs</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── STATS TICKER ──────────────────────────────────────────── -->
+<div class="stats-bar">
+  <div class="stats-track">
+    <!-- Duplicated for seamless loop -->
+    <span class="stats-item"><span class="dot"></span> Loan Size: $1M – $25M</span>
+    <span class="stats-item"><span class="dot"></span> Fixed Rate: 10% – 14%</span>
+    <span class="stats-item"><span class="dot"></span> LTV: Up to 70%</span>
+    <span class="stats-item"><span class="dot"></span> LTC: Up to 80%</span>
+    <span class="stats-item"><span class="dot"></span> Interest-Only Payments</span>
+    <span class="stats-item"><span class="dot"></span> Same-Day LOI</span>
+    <span class="stats-item"><span class="dot"></span> 10 – 30 Days to Funding</span>
+    <span class="stats-item"><span class="dot"></span> 10 Active States</span>
+    <span class="stats-item"><span class="dot"></span> First Mortgage Security</span>
+    <span class="stats-item"><span class="dot"></span> Origination: 1% – 2%</span>
+    <span class="stats-item"><span class="dot"></span> Loan Size: $1M – $25M</span>
+    <span class="stats-item"><span class="dot"></span> Fixed Rate: 10% – 14%</span>
+    <span class="stats-item"><span class="dot"></span> LTV: Up to 70%</span>
+    <span class="stats-item"><span class="dot"></span> LTC: Up to 80%</span>
+    <span class="stats-item"><span class="dot"></span> Interest-Only Payments</span>
+    <span class="stats-item"><span class="dot"></span> Same-Day LOI</span>
+    <span class="stats-item"><span class="dot"></span> 10 – 30 Days to Funding</span>
+    <span class="stats-item"><span class="dot"></span> 10 Active States</span>
+    <span class="stats-item"><span class="dot"></span> First Mortgage Security</span>
+    <span class="stats-item"><span class="dot"></span> Origination: 1% – 2%</span>
+  </div>
+</div>
+
+<!-- ── ABOUT ─────────────────────────────────────────────────── -->
+<section id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-sticky">
+        <span class="eyebrow eyebrow-dark">Who We Are</span>
+        <h2>Direct Lender.<br>Trusted Partner.</h2>
+        <p>
+          1Oak Lending is a vertically integrated, family-backed investment firm focused on structuring and investing in diversified portfolios of short-term, senior-secured loans collateralized by U.S. commercial real estate.
+        </p>
+        <p style="margin-top:16px;">
+          Disciplined capital deployment, direct lending, and strategic real estate investments designed to deliver consistent yield enhancement and downside protection across market cycles.
+        </p>
+        <blockquote>
+          <p>"If your situation falls outside a standard box, we structure a solution that fits."</p>
+        </blockquote>
+      </div>
+
+      <div class="pillars">
+        <div class="pillar">
+          <span class="pillar-num">01</span>
+          <div class="pillar-content">
+            <h4>Finding Value Where Others See Complexity</h4>
+            <p>We actively seek opportunities rather than passively receiving submissions. Leveraging decades of experience as owner-operators, our team identifies high-potential assets through proactive outreach, extensive networks, and sector-agnostic analysis.</p>
+          </div>
+        </div>
+        <div class="pillar">
+          <span class="pillar-num">02</span>
+          <div class="pillar-content">
+            <h4>Precision Built on Experience</h4>
+            <p>Our underwriting is grounded in operational reality. A rigorous, data-driven framework manages risk and combines operational insight with streamlined internal processes — faster approvals without sacrificing discipline.</p>
+          </div>
+        </div>
+        <div class="pillar">
+          <span class="pillar-num">03</span>
+          <div class="pillar-content">
+            <h4>Tailored Solutions for Visionary Borrowers</h4>
+            <p>We offer bespoke financing structures with customized solutions and aligned incentives. Working alongside banks, private lenders, debt funds, and equity partners to structure capital stacks that make complex deals workable.</p>
+          </div>
+        </div>
+        <div class="pillar">
+          <span class="pillar-num">04</span>
+          <div class="pillar-content">
+            <h4>We Move Decisively When Others Hesitate</h4>
+            <p>Conviction-based underwriting, intelligent capital structuring, and rapid deployment. Our principals have operated on the front lines of transactions — sourcing deals, underwriting business plans, negotiating structures, and managing capital through acquisition, execution, and exit.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PROGRAMS ───────────────────────────────────────────────── -->
+<section id="programs">
+  <div class="container">
+    <div class="programs-header">
+      <div>
+        <span class="eyebrow">Lending Programs</span>
+        <h2>Purpose-Built<br>Financing</h2>
+      </div>
+      <p>
+        We underwrite to future performance — factoring in renovations, lease-up efforts, operational improvements, and capital initiatives that will enhance cash flow and asset value. Our loans are purpose-built to solve problems, not to fit within traditional underwriting boxes.
+      </p>
+    </div>
+
+    <div class="programs-cards">
+
+      <!-- Acquisition -->
+      <div class="prog-card">
+        <div class="prog-tag">Acquisition Loan</div>
+        <div class="prog-name">Acquire &<br>Execute</div>
+        <p class="prog-desc">
+          Designed for owners and operators executing a business plan to acquire, improve, reposition, or stabilize a property before refinancing, holding, or selling. We underwrite to future performance ahead of the property qualifying for traditional financing.
+        </p>
+        <div class="prog-terms">
+          <div class="term-row"><span class="tl">Loan Amount</span><span class="tv">$2M – $20M</span></div>
+          <div class="term-row"><span class="tl">Term</span><span class="tv">12 – 24 Months</span></div>
+          <div class="term-row"><span class="tl">LTV / LTC</span><span class="tv">70% / 80%</span></div>
+          <div class="term-row"><span class="tl">Rate</span><span class="tv">Fixed, 10% – 14%</span></div>
+          <div class="term-row"><span class="tl">Amortization</span><span class="tv">Interest-Only</span></div>
+          <div class="term-row"><span class="tl">Origination</span><span class="tv">1% – 2%</span></div>
+          <div class="term-row"><span class="tl">Timeline</span><span class="tv">10 – 30 Days</span></div>
+          <div class="term-row"><span class="tl">Property Types</span><span class="tv">Multifamily, Industrial, Retail, Office</span></div>
+        </div>
+        <p class="prog-note">Security: First mortgage lien or deed of trust. Min. 9-month interest on 12-month terms. Appraisal + Phase 1 required.</p>
+      </div>
+
+      <!-- Bridge — Highlighted -->
+      <div class="prog-card highlight">
+        <div class="prog-tag">Bridge Loan</div>
+        <div class="prog-name">Bridge<br>the Gap</div>
+        <p class="prog-desc">
+          Short-term financing for non-standard, time-sensitive, or complex situations where conventional lenders are unable or unwilling to proceed — imminent maturity, foreclosure pressure, capital shortfalls, partnership disputes, or temporary cash-flow disruption.
+        </p>
+        <div class="prog-terms">
+          <div class="term-row"><span class="tl">Loan Amount</span><span class="tv">$1M – $25M</span></div>
+          <div class="term-row"><span class="tl">Term</span><span class="tv">12 Months</span></div>
+          <div class="term-row"><span class="tl">LTV / LTC</span><span class="tv">70% / 80%</span></div>
+          <div class="term-row"><span class="tl">Rate</span><span class="tv">Fixed, 10% – 14%</span></div>
+          <div class="term-row"><span class="tl">Amortization</span><span class="tv">Interest-Only</span></div>
+          <div class="term-row"><span class="tl">Origination</span><span class="tv">1% – 2%</span></div>
+          <div class="term-row"><span class="tl">Timeline</span><span class="tv">10 – 30 Days</span></div>
+          <div class="term-row"><span class="tl">Property Types</span><span class="tv">All Commercial Asset Classes</span></div>
+        </div>
+        <p class="prog-note">Security: First mortgage lien or deed of trust. Broadest collateral eligibility — we lend where the underlying real estate remains fundamentally sound.</p>
+      </div>
+
+      <!-- Construction -->
+      <div class="prog-card">
+        <div class="prog-tag">Construction Loan</div>
+        <div class="prog-name">Build &<br>Develop</div>
+        <p class="prog-desc">
+          Specialized financing for ground-up development and major adaptive reuse. Structured around a defined development plan, budget, and timeline — carries the project through completion and stabilization before transitioning into permanent financing or sale.
+        </p>
+        <div class="prog-terms">
+          <div class="term-row"><span class="tl">Loan Amount</span><span class="tv">$2M – $20M</span></div>
+          <div class="term-row"><span class="tl">Term</span><span class="tv">12 Months</span></div>
+          <div class="term-row"><span class="tl">As-Complete LTV / LTC</span><span class="tv">70% / 80%</span></div>
+          <div class="term-row"><span class="tl">Rate</span><span class="tv">Fixed, 10% – 14%</span></div>
+          <div class="term-row"><span class="tl">Amortization</span><span class="tv">IO on Drawn Balance</span></div>
+          <div class="term-row"><span class="tl">Origination</span><span class="tv">1% – 2%</span></div>
+          <div class="term-row"><span class="tl">Timeline</span><span class="tv">30 – 45 Days</span></div>
+          <div class="term-row"><span class="tl">Property Types</span><span class="tv">Multifamily, Mixed-Use, BTR</span></div>
+        </div>
+        <p class="prog-note">Covers land acquisition (in some cases), hard and soft construction costs. Interest accrues only on drawn balance.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── PROCESS ────────────────────────────────────────────────── -->
+<section id="process">
+  <div class="container">
+    <div class="process-header">
+      <div>
+        <span class="eyebrow eyebrow-dark">How It Works</span>
+        <h2>From Submission<br>to Funding</h2>
+      </div>
+      <p>
+        Our process is built for speed and certainty. Same-day LOIs, direct decision-makers, and no bureaucracy between you and close. We move decisively when others hesitate.
+      </p>
+    </div>
+
+    <div class="process-steps">
+      <div class="step">
+        <div class="step-circle">01</div>
+        <h4>Deal Submission</h4>
+        <p>Submit your deal details via our intake form or call us directly. We evaluate all commercial property types and non-standard situations.</p>
+        <span class="step-time">Day 1</span>
+      </div>
+      <div class="step">
+        <div class="step-circle">02</div>
+        <h4>Discovery & Term Sheet</h4>
+        <p>A direct call with our team. We issue a same-day Letter of Intent and move quickly into formal underwriting — no committees, no delays.</p>
+        <span class="step-time">Day 2 – Day 5</span>
+      </div>
+      <div class="step">
+        <div class="step-circle">03</div>
+        <h4>Underwriting & Due Diligence</h4>
+        <p>Streamlined internal processes with direct decision-makers. Conviction-based underwriting grounded in operational reality and data-driven risk analysis.</p>
+        <span class="step-time">Week 1 – Week 2</span>
+      </div>
+      <div class="step">
+        <div class="step-circle">04</div>
+        <h4>Closing & Funding</h4>
+        <p>Acquisition and bridge loans close in 10–30 days. Construction in 30–45 days. Direct access to your lending team throughout servicing.</p>
+        <span class="step-time">10 – 45 Days to Fund</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── GEOGRAPHY ──────────────────────────────────────────────── -->
+<section id="geography">
+  <div class="container">
+    <div class="geo-grid">
+      <div class="geo-left">
+        <span class="eyebrow">Geographic Footprint</span>
+        <h2>Active Across<br>Key U.S. Markets</h2>
+        <p>
+          We lend in high-growth, supply-constrained markets with strong fundamentals. Our team brings direct owner-operator experience across the Sun Belt, Mountain West, Pacific Coast, and Pacific Northwest.
+        </p>
+        <div class="state-grid">
+          <div class="state-chip">AZ</div>
+          <div class="state-chip">CA</div>
+          <div class="state-chip">CO</div>
+          <div class="state-chip">FL</div>
+          <div class="state-chip">NV</div>
+          <div class="state-chip">OK</div>
+          <div class="state-chip">OR</div>
+          <div class="state-chip">TX</div>
+          <div class="state-chip">UT</div>
+          <div class="state-chip">WA</div>
+        </div>
+      </div>
+
+      <div>
+        <span class="eyebrow" style="margin-bottom:16px;">Recent Transactions</span>
+        <div class="geo-deals">
+          <div class="deal-tile">
+            <div class="deal-amount">$10.6MM</div>
+            <div class="deal-desc">Hotel Acquisition<br>New Mexico</div>
+            <div class="deal-type">Acquisition Loan</div>
+          </div>
+          <div class="deal-tile">
+            <div class="deal-amount">$8.99MM</div>
+            <div class="deal-desc">Retail Refinance<br>Florida</div>
+            <div class="deal-type">Bridge Loan</div>
+          </div>
+          <div class="deal-tile">
+            <div class="deal-amount">$8.3MM</div>
+            <div class="deal-desc">Construction Refinance<br>Florida</div>
+            <div class="deal-type">Construction Loan</div>
+          </div>
+          <div class="deal-tile">
+            <div class="deal-amount">$3MM</div>
+            <div class="deal-desc">Industrial Refinance<br>California</div>
+            <div class="deal-type">Bridge Loan</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TEAM ───────────────────────────────────────────────────── -->
+<section id="team">
+  <div class="container">
+    <div class="team-header">
+      <div>
+        <span class="eyebrow eyebrow-dark">Leadership</span>
+        <h2>Our Team</h2>
+      </div>
+      <p>
+        Directed by executives with decades of experience across commercial real estate, asset management, oil and gas, and renewable energy — professionals who have operated on the front lines of transactions and move decisively when others hesitate.
+      </p>
+    </div>
+
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="tc-mono">CT</div>
+        <div class="tc-name">Charlie Thomas</div>
+        <div class="tc-title">Managing Partner</div>
+        <p class="tc-bio">Serial entrepreneur who scaled previous businesses to over $200M annual revenue. Founded Greenlight Energy and PerfX Wireline Services — both acquired. Now provides strategic capital solutions across commercial real estate and private credit.</p>
+      </div>
+      <div class="team-card">
+        <div class="tc-mono">DH</div>
+        <div class="tc-name">Devin Hunter</div>
+        <div class="tc-title">Managing Director</div>
+        <p class="tc-bio">Over a decade managing complex asset portfolios. Previously Reserves Director at DJR Energy overseeing $1B in A&amp;D opportunities and $250M annual capital budgets. Combines technical analysis with financial modeling for disciplined underwriting.</p>
+      </div>
+      <div class="team-card">
+        <div class="tc-mono">ET</div>
+        <div class="tc-name">Eric Thomas</div>
+        <div class="tc-title">Sr. Business Development</div>
+        <p class="tc-bio">Nearly nine years in commercial real estate, land, and infrastructure. Previously Managing Director at EOS Land Holdings (2 GW solar capacity) and investment sales at Marcus &amp; Millichap and Taylor Street. Over $100M in total transaction volume.</p>
+      </div>
+      <div class="team-card">
+        <div class="tc-mono">GH</div>
+        <div class="tc-name">Griffin Hillier</div>
+        <div class="tc-title">Business Development</div>
+        <p class="tc-bio">Previously Business Development Executive at EOS Land Holdings, leading outbound prospecting to landowners, brokers, and industry stakeholders across multiple U.S. markets. Focused on deal origination and relationship development.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SUBMIT ─────────────────────────────────────────────────── -->
+<section id="submit">
+  <div class="container">
+    <div class="submit-grid">
+      <div class="submit-left">
+        <span class="eyebrow">Submit a Deal</span>
+        <h2>Let's Work<br><em>Together</em></h2>
+        <p>
+          We work with brokers, principals, sponsors, and developers across all commercial property types. If your deal doesn't fit a traditional box, we want to hear from you.
+        </p>
+        <p>
+          A member of our team responds within one business day.
+        </p>
+        <div class="contact-direct">
+          <a href="tel:7204077117" class="contact-line">
+            <span class="contact-line-label">Phone</span>
+            <span class="contact-line-val">(720) 407-7117</span>
+          </a>
+          <a href="mailto:general@1oaklending.com" class="contact-line">
+            <span class="contact-line-label">Email</span>
+            <span class="contact-line-val">general@1oaklending.com</span>
+          </a>
+        </div>
+      </div>
+
+      <form class="form-wrap" action="mailto:general@1oaklending.com" method="POST" enctype="text/plain">
+        <div class="form-row">
+          <div class="fg">
+            <label for="f-name">Full Name *</label>
+            <input type="text" id="f-name" name="name" placeholder="Jane Smith" required />
+          </div>
+          <div class="fg">
+            <label for="f-company">Company / Firm</label>
+            <input type="text" id="f-company" name="company" placeholder="Acme Capital" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="fg">
+            <label for="f-email">Email Address *</label>
+            <input type="email" id="f-email" name="email" placeholder="jane@example.com" required />
+          </div>
+          <div class="fg">
+            <label for="f-phone">Phone Number</label>
+            <input type="tel" id="f-phone" name="phone" placeholder="(555) 000-0000" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="fg">
+            <label for="f-role">I Am A *</label>
+            <select id="f-role" name="role" required>
+              <option value="" disabled selected>Select your role</option>
+              <option>Mortgage Broker</option>
+              <option>Principal / Sponsor</option>
+              <option>Developer</option>
+              <option>Operator</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label for="f-program">Loan Program *</label>
+            <select id="f-program" name="program" required>
+              <option value="" disabled selected>Select program</option>
+              <option>Acquisition Loan</option>
+              <option>Bridge Loan</option>
+              <option>Construction Loan</option>
+              <option>Not Sure — Advise Me</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="fg">
+            <label for="f-amount">Loan Request *</label>
+            <input type="text" id="f-amount" name="amount" placeholder="e.g. $5,000,000" required />
+          </div>
+          <div class="fg">
+            <label for="f-ptype">Property Type *</label>
+            <select id="f-ptype" name="property_type" required>
+              <option value="" disabled selected>Select type</option>
+              <option>Multifamily</option>
+              <option>Industrial</option>
+              <option>Retail / Mixed-Use</option>
+              <option>Office</option>
+              <option>Hotel / Hospitality</option>
+              <option>Land / Ground-Up</option>
+              <option>Other Commercial</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="fg">
+            <label for="f-loc">Property Location</label>
+            <input type="text" id="f-loc" name="location" placeholder="e.g. Austin, TX" />
+          </div>
+          <div class="fg">
+            <label for="f-timeline">Desired Timeline</label>
+            <select id="f-timeline" name="timeline">
+              <option value="" disabled selected>Select timeline</option>
+              <option>ASAP / Urgent (&lt;2 weeks)</option>
+              <option>2 – 4 Weeks</option>
+              <option>30 – 45 Days</option>
+              <option>Flexible</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row single">
+          <div class="fg">
+            <label for="f-desc">Deal Summary *</label>
+            <textarea id="f-desc" name="description" placeholder="Property details, business plan, capital structure, current status, and any time constraints or complexities we should know about." required></textarea>
+          </div>
+        </div>
+        <div class="form-footer">
+          <p class="form-disclaimer">All deal information is kept strictly confidential. We respond within one business day.</p>
+          <button type="submit" class="btn-submit">Submit Deal →</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ─────────────────────────────────────────────────── -->
+<footer>
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="footer-logo">1Oak Lending</div>
+        <p>A vertically integrated, family-backed investment firm. Short-term, senior-secured commercial real estate lending and strategic investments.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Company</h5>
+        <ul>
+          <li><a href="#about">About</a></li>
+          <li><a href="#team">Team</a></li>
+          <li><a href="#geography">Markets</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Programs</h5>
+        <ul>
+          <li><a href="#programs">Acquisition Loan</a></li>
+          <li><a href="#programs">Bridge Loan</a></li>
+          <li><a href="#programs">Construction Loan</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Contact</h5>
+        <ul>
+          <li><a href="#submit">Submit a Deal</a></li>
+          <li><a href="tel:7204077117">(720) 407-7117</a></li>
+          <li><a href="mailto:general@1oaklending.com">general@1oaklending.com</a></li>
+          <li><a href="#">LinkedIn</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2024 1Oak Lending. All rights reserved.</p>
+      <span class="footer-tagline">Strategic Capital. Creative Solutions. Investor Driven.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Nav scroll shadow
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 20);
+  }, { passive: true });
+</script>
+
+</body>
+</html>
