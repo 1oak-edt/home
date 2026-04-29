@@ -982,6 +982,115 @@
       color: rgba(250,250,248,0.25);
     }
 
+    /* ── MAP SECTION ────────────────────────────────────────── */
+    #map {
+      background: var(--cream-dark);
+      padding: 110px 0 80px;
+      overflow: hidden;
+    }
+    .map-header { margin-bottom: 52px; }
+    .map-header h2 {
+      font-family: 'Quattrocento', serif;
+      font-size: clamp(34px, 4vw, 52px);
+      font-weight: 700;
+      color: var(--forest);
+      margin-top: 4px;
+    }
+    .map-header p {
+      margin-top: 14px;
+      font-size: 15px;
+      font-weight: 300;
+      color: var(--text-muted);
+      max-width: 520px;
+      line-height: 1.75;
+    }
+    .map-outer {
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid var(--border);
+      background: #e8ede0;
+      border-radius: 2px;
+    }
+    #map-svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      animation: map-drift 28s ease-in-out infinite;
+      transform-origin: 52% 50%;
+    }
+    @keyframes map-drift {
+      0%   { transform: scale(1.00) translate(0px,  0px);  }
+      25%  { transform: scale(1.04) translate(-14px,-7px); }
+      50%  { transform: scale(1.06) translate(7px,  -11px);}
+      75%  { transform: scale(1.04) translate(12px, -4px); }
+      100% { transform: scale(1.00) translate(0px,  0px);  }
+    }
+    /* State path styles injected by JS */
+    .map-state        { stroke: #fff; stroke-width: 0.5; stroke-linejoin: round; fill: #cdd9be; }
+    .map-state-border { fill: none; stroke: rgba(255,255,255,0.7); stroke-width: 0.4; }
+    .map-state.active {
+      fill: var(--forest);
+      stroke: #fff;
+      stroke-width: 0.8;
+      cursor: default;
+      transition: fill 0.25s;
+    }
+    .map-state.active:hover { fill: #3a5025; }
+    /* Staggered glow per active state */
+    @keyframes sglow {
+      0%,100% { filter: drop-shadow(0 0 0px  rgba(35,44,23,0));    }
+      50%     { filter: drop-shadow(0 2px 9px rgba(35,44,23,0.55));}
+    }
+    .map-state.active { animation: sglow 4s ease-in-out infinite; }
+
+    /* State abbreviation labels */
+    .map-label {
+      font-family: 'Fragment Mono', monospace;
+      font-size: 9px;
+      fill: #e4c386;
+      text-anchor: middle;
+      dominant-baseline: middle;
+      pointer-events: none;
+      letter-spacing: 0.05em;
+    }
+
+    /* Map loading placeholder */
+    .map-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 440px;
+      color: var(--text-faint);
+      font-family: 'Fragment Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+    }
+
+    /* Legend */
+    .map-legend {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Fragment Mono', monospace;
+      font-size: 10.5px;
+      color: var(--text-muted);
+    }
+    .legend-swatch {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+    .legend-swatch.active   { background: var(--forest); }
+    .legend-swatch.inactive { background: #cdd9be; border: 1px solid #b8c8a8; }
+
     /* ── RESPONSIVE ─────────────────────────────────────────── */
     @media (max-width: 1024px) {
       .container { padding: 0 32px; }
@@ -1470,6 +1579,116 @@
     </div>
   </div>
 </section>
+
+<!-- D3 + TopoJSON from CDN for accurate geographic paths -->
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+
+<!-- ── MAP ───────────────────────────────────────────────────── -->
+<section id="map">
+  <div class="container">
+    <div class="map-header">
+      <span class="eyebrow eyebrow-dark">Active Markets</span>
+      <h2>Where We're Looking At Deals</h2>
+      <p>We're actively deploying capital across high-growth, supply-constrained markets. Reach out if your deal is in one of our target states.</p>
+    </div>
+  </div>
+
+  <div class="container" style="max-width:1200px;">
+    <div class="map-outer" id="map-container">
+      <div class="map-loading" id="map-loading">Loading map&hellip;</div>
+      <svg id="map-svg"></svg>
+      <!-- placeholder so the outer div has height before JS fires -->
+      <noscript><p style="padding:40px;color:#5a6350;font-size:13px;">Map requires JavaScript. Active states: AZ, CA, CO, FL, NV, OK, OR, TX, UT, WA.</p></noscript>
+      <!-- !! OLD POLYGON PLACEHOLDERS REMOVED — D3 renders below !! -->
+    </div>
+
+    <div class="map-legend">
+      <div class="legend-item">
+        <div class="legend-swatch active"></div>
+        Active lending market
+      </div>
+      <div class="legend-item">
+        <div class="legend-swatch inactive"></div>
+        Outside current footprint
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function () {
+  // FIPS → { abbr, delay (s) } — ordered W→E for staggered wave
+  const ACTIVE = {
+    53: { abbr: 'WA', delay: 0.0 },
+    41: { abbr: 'OR', delay: 0.3 },
+     6: { abbr: 'CA', delay: 0.6 },
+    32: { abbr: 'NV', delay: 0.9 },
+    49: { abbr: 'UT', delay: 1.2 },
+     8: { abbr: 'CO', delay: 1.5 },
+     4: { abbr: 'AZ', delay: 1.8 },
+    40: { abbr: 'OK', delay: 2.1 },
+    48: { abbr: 'TX', delay: 2.4 },
+    12: { abbr: 'FL', delay: 2.7 },
+  };
+
+  const container = document.getElementById('map-container');
+  const loading   = document.getElementById('map-loading');
+  const svgEl     = document.getElementById('map-svg');
+
+  function render(us) {
+    loading.style.display = 'none';
+
+    const W = container.clientWidth  || 960;
+    const H = Math.round(W * 0.585);
+
+    // Use D3 Albers USA — auto-positions AK + HI as insets
+    const projection = d3.geoAlbersUsa()
+      .fitExtent([[24, 20], [W - 24, H - 20]],
+        topojson.feature(us, us.objects.states));
+    const path = d3.geoPath().projection(projection);
+
+    const svg = d3.select(svgEl)
+      .attr('viewBox', `0 0 ${W} ${H}`)
+      .attr('width',  '100%')
+      .attr('height', H);
+
+    const features = topojson.feature(us, us.objects.states).features;
+
+    // State fills
+    svg.selectAll('path.map-state')
+      .data(features)
+      .enter().append('path')
+        .attr('class', d => ACTIVE[+d.id] ? 'map-state active' : 'map-state')
+        .attr('d', path)
+        .style('animation-delay', d => ACTIVE[+d.id] ? ACTIVE[+d.id].delay + 's' : null);
+
+    // Interior borders
+    svg.append('path')
+      .datum(topojson.mesh(us, us.objects.states, (a, b) => a !== b))
+      .attr('class', 'map-state-border')
+      .attr('d', path);
+
+    // Labels on active states
+    features.forEach(f => {
+      const info = ACTIVE[+f.id];
+      if (!info) return;
+      const c = path.centroid(f);
+      if (!c || isNaN(c[0])) return;
+      svg.append('text')
+        .attr('class', 'map-label')
+        .attr('x', c[0])
+        .attr('y', c[1])
+        .text(info.abbr);
+    });
+  }
+
+  // Fetch TopoJSON from CDN
+  d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json')
+    .then(render)
+    .catch(() => { loading.textContent = 'Map unavailable — check connection.'; });
+})();
+</script>
 
 <!-- ── FOOTER ─────────────────────────────────────────────────── -->
 <footer>
