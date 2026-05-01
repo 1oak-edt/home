@@ -1004,67 +1004,101 @@
       max-width: 520px;
       line-height: 1.75;
     }
+
+    /* Map container — dark, institutional */
     .map-outer {
       width: 100%;
       overflow: hidden;
       position: relative;
-      border: 1px solid var(--border);
-      background: #e8ede0;
-      border-radius: 2px;
+      background: #0b1507;
+      border: 1px solid rgba(35,44,23,0.3);
+    }
+    /* Fine grid behind SVG */
+    .map-outer::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
+      background-size: 52px 52px;
+      pointer-events: none;
+      z-index: 0;
+    }
+    /* Vignette edge fade over SVG */
+    .map-outer::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 88% 88% at 50% 50%,
+        transparent 30%, rgba(11,21,7,0.72) 100%);
+      pointer-events: none;
+      z-index: 3;
     }
     #map-svg {
       display: block;
       width: 100%;
       height: auto;
-      animation: map-drift 28s ease-in-out infinite;
-      transform-origin: 52% 50%;
+      position: relative;
+      z-index: 1;
     }
-    @keyframes map-drift {
-      0%   { transform: scale(1.00) translate(0px,  0px);  }
-      25%  { transform: scale(1.04) translate(-14px,-7px); }
-      50%  { transform: scale(1.06) translate(7px,  -11px);}
-      75%  { transform: scale(1.04) translate(12px, -4px); }
-      100% { transform: scale(1.00) translate(0px,  0px);  }
-    }
-    /* State path styles injected by JS */
-    .map-state        { stroke: #fff; stroke-width: 0.5; stroke-linejoin: round; fill: #cdd9be; }
-    .map-state-border { fill: none; stroke: rgba(255,255,255,0.7); stroke-width: 0.4; }
-    .map-state.active {
-      fill: var(--forest);
-      stroke: #fff;
-      stroke-width: 0.8;
-      cursor: default;
-      transition: fill 0.25s;
-    }
-    .map-state.active:hover { fill: #3a5025; }
-    /* Staggered glow per active state */
-    @keyframes sglow {
-      0%,100% { filter: drop-shadow(0 0 0px  rgba(35,44,23,0));    }
-      50%     { filter: drop-shadow(0 2px 9px rgba(35,44,23,0.55));}
-    }
-    .map-state.active { animation: sglow 4s ease-in-out infinite; }
 
-    /* State abbreviation labels */
-    .map-label {
+    /* ── State fills (D3-assigned classes) ─────── */
+    .map-state {
+      fill: #182510;
+      stroke: rgba(255,255,255,0.045);
+      stroke-width: 0.5;
+      stroke-linejoin: round;
+    }
+    .map-state-border {
+      fill: none;
+      stroke: rgba(255,255,255,0.07);
+      stroke-width: 0.35;
+      stroke-linejoin: round;
+    }
+    .map-state.active {
+      fill: #2d4519;
+      stroke: rgba(228,195,134,0.6);
+      stroke-width: 1;
+      cursor: default;
+      transition: fill 0.2s;
+    }
+    .map-state.active:hover { fill: #3d5c22; }
+
+    /* ── Pulse rings radiating from active states ─ */
+    @keyframes ring-expand {
+      0%   { r: 3;  stroke-opacity: 0.9; stroke-width: 1.5; }
+      100% { r: 28; stroke-opacity: 0;   stroke-width: 0.3; }
+    }
+    .pulse-ring {
+      fill: none;
+      stroke: #e4c386;
+      animation: ring-expand 2.6s ease-out infinite;
+    }
+
+    /* Dot + label */
+    .state-dot  { fill: #e4c386; }
+    .map-label  {
       font-family: 'Fragment Mono', monospace;
-      font-size: 9px;
+      font-size: 8px;
       fill: #e4c386;
       text-anchor: middle;
-      dominant-baseline: middle;
+      dominant-baseline: auto;
       pointer-events: none;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.06em;
     }
 
-    /* Map loading placeholder */
+    /* Loading placeholder */
     .map-loading {
       display: flex;
       align-items: center;
       justify-content: center;
       height: 440px;
-      color: var(--text-faint);
+      background: #0b1507;
+      color: rgba(228,195,134,0.35);
       font-family: 'Fragment Mono', monospace;
       font-size: 11px;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.12em;
     }
 
     /* Legend */
@@ -1088,8 +1122,8 @@
       height: 14px;
       flex-shrink: 0;
     }
-    .legend-swatch.active   { background: var(--forest); }
-    .legend-swatch.inactive { background: #cdd9be; border: 1px solid #b8c8a8; }
+    .legend-swatch.active   { background: #2d4519; border: 1px solid rgba(228,195,134,0.55); }
+    .legend-swatch.inactive { background: #182510; border: 1px solid rgba(255,255,255,0.1); }
 
     /* ── RESPONSIVE ─────────────────────────────────────────── */
     @media (max-width: 1024px) {
@@ -1618,18 +1652,27 @@
 
 <script>
 (function () {
-  // FIPS → { abbr, delay (s) } — ordered W→E for staggered wave
+  // FIPS → { abbr, ring pulse delay (s) } — staggered W→E
   const ACTIVE = {
-    53: { abbr: 'WA', delay: 0.0 },
-    41: { abbr: 'OR', delay: 0.3 },
-     6: { abbr: 'CA', delay: 0.6 },
-    32: { abbr: 'NV', delay: 0.9 },
-    49: { abbr: 'UT', delay: 1.2 },
-     8: { abbr: 'CO', delay: 1.5 },
-     4: { abbr: 'AZ', delay: 1.8 },
-    40: { abbr: 'OK', delay: 2.1 },
-    48: { abbr: 'TX', delay: 2.4 },
-    12: { abbr: 'FL', delay: 2.7 },
+    53: { abbr: 'WA', delay: 0.00 },
+    41: { abbr: 'OR', delay: 0.35 },
+     6: { abbr: 'CA', delay: 0.70 },
+    32: { abbr: 'NV', delay: 1.05 },
+    49: { abbr: 'UT', delay: 1.40 },
+     8: { abbr: 'CO', delay: 1.75 },
+     4: { abbr: 'AZ', delay: 2.10 },
+    40: { abbr: 'OK', delay: 2.45 },
+    48: { abbr: 'TX', delay: 2.80 },
+    12: { abbr: 'FL', delay: 3.15 },
+  };
+
+  // Manual [lon, lat] overrides for states where D3 path.centroid()
+  // falls outside the polygon body (irregular coastlines, panhandles).
+  const GEO_CENTER = {
+    12: [-81.5, 28.1],   // FL — peninsula body, not panhandle
+     6: [-119.7, 37.2],  // CA — long state, keep label central
+    48: [-99.3,  31.2],  // TX
+    40: [-97.1,  35.5],  // OK
   };
 
   const container = document.getElementById('map-container');
@@ -1639,10 +1682,9 @@
   function render(us) {
     loading.style.display = 'none';
 
-    const W = container.clientWidth  || 960;
+    const W = container.clientWidth || 960;
     const H = Math.round(W * 0.585);
 
-    // Use D3 Albers USA — auto-positions AK + HI as insets
     const projection = d3.geoAlbersUsa()
       .fitExtent([[24, 20], [W - 24, H - 20]],
         topojson.feature(us, us.objects.states));
@@ -1655,35 +1697,55 @@
 
     const features = topojson.feature(us, us.objects.states).features;
 
-    // State fills
+    // Draw state fills
     svg.selectAll('path.map-state')
       .data(features)
       .enter().append('path')
         .attr('class', d => ACTIVE[+d.id] ? 'map-state active' : 'map-state')
-        .attr('d', path)
-        .style('animation-delay', d => ACTIVE[+d.id] ? ACTIVE[+d.id].delay + 's' : null);
+        .attr('d', path);
 
-    // Interior borders
+    // Interior state borders
     svg.append('path')
       .datum(topojson.mesh(us, us.objects.states, (a, b) => a !== b))
       .attr('class', 'map-state-border')
       .attr('d', path);
 
-    // Labels on active states
+    // Markers on active states — pulse rings + dot + label
     features.forEach(f => {
       const info = ACTIVE[+f.id];
       if (!info) return;
-      const c = path.centroid(f);
-      if (!c || isNaN(c[0])) return;
+
+      // Use manual geographic center when defined, else D3 centroid
+      const geoOverride = GEO_CENTER[+f.id];
+      const pos = geoOverride ? projection(geoOverride) : path.centroid(f);
+      if (!pos || isNaN(pos[0]) || isNaN(pos[1])) return;
+
+      const [cx, cy] = pos;
+
+      // Two rings offset by half the period → continuous double-pulse
+      [0, 1.3].forEach(offset => {
+        svg.append('circle')
+          .attr('class', 'pulse-ring')
+          .attr('cx', cx).attr('cy', cy)
+          .attr('r', 3)
+          .style('animation-delay', (info.delay + offset) + 's');
+      });
+
+      // Solid dot at centroid
+      svg.append('circle')
+        .attr('class', 'state-dot')
+        .attr('cx', cx).attr('cy', cy)
+        .attr('r', 2.2);
+
+      // Abbreviation label just below dot
       svg.append('text')
         .attr('class', 'map-label')
-        .attr('x', c[0])
-        .attr('y', c[1])
+        .attr('x', cx)
+        .attr('y', cy + 10)
         .text(info.abbr);
     });
   }
 
-  // Fetch TopoJSON from CDN
   d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json')
     .then(render)
     .catch(() => { loading.textContent = 'Map unavailable — check connection.'; });
