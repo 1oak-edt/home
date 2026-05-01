@@ -1060,7 +1060,7 @@
     }
     .pulse-ring {
       fill: none;
-      stroke: var(--forest);
+      stroke: #7aaa45;
       animation: ring-expand 2.8s ease-out infinite;
     }
 
@@ -1673,17 +1673,20 @@
     const W = container.clientWidth || 960;
     const H = Math.round(W * 0.585);
 
-    const projection = d3.geoAlbersUsa()
-      .fitExtent([[24, 20], [W - 24, H - 20]],
-        topojson.feature(us, us.objects.states));
+    // Continental US only — exclude Alaska (2) and Hawaii (15)
+    const allFeatures = topojson.feature(us, us.objects.states).features;
+    const features = allFeatures.filter(f => +f.id !== 2 && +f.id !== 15);
+    const contCollection = { type: 'FeatureCollection', features };
+
+    // geoAlbers (no AK/HI insets) fitted to continental states
+    const projection = d3.geoAlbers()
+      .fitExtent([[24, 20], [W - 24, H - 20]], contCollection);
     const path = d3.geoPath().projection(projection);
 
     const svg = d3.select(svgEl)
       .attr('viewBox', `0 0 ${W} ${H}`)
       .attr('width',  '100%')
       .attr('height', H);
-
-    const features = topojson.feature(us, us.objects.states).features;
 
     // Draw state fills
     svg.selectAll('path.map-state')
