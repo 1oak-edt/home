@@ -1109,8 +1109,8 @@
       height: 14px;
       flex-shrink: 0;
     }
-    .legend-swatch.active   { background: #2d4519; border: 1px solid rgba(228,195,134,0.55); }
-    .legend-swatch.inactive { background: #182510; border: 1px solid rgba(255,255,255,0.1); }
+    .legend-swatch.active   { background: #232c17; border: 1px solid rgba(228,195,134,0.35); }
+    .legend-swatch.inactive { background: #cdc8c0; border: 1px solid rgba(0,0,0,0.08); }
 
     /* ── RESPONSIVE ─────────────────────────────────────────── */
     @media (max-width: 1024px) {
@@ -1668,16 +1668,13 @@
     loading.style.display = 'none';
 
     const W = container.clientWidth || 960;
-    const H = Math.round(W * 0.62);
+    const H = Math.round(W * 0.585);
 
-    // Continental US only — exclude Alaska (2) and Hawaii (15)
-    const allFeatures = topojson.feature(us, us.objects.states).features;
-    const features = allFeatures.filter(f => +f.id !== 2 && +f.id !== 15);
-    const contCollection = { type: 'FeatureCollection', features };
+    const features = topojson.feature(us, us.objects.states).features;
+    const allCollection = { type: 'FeatureCollection', features };
 
-    // geoAlbers (no AK/HI insets) fitted to continental states
-    const projection = d3.geoAlbers()
-      .fitExtent([[8, 8], [W - 8, H - 8]], contCollection);
+    const projection = d3.geoAlbersUsa()
+      .fitExtent([[8, 8], [W - 8, H - 8]], allCollection);
     const path = d3.geoPath().projection(projection);
 
     const svg = d3.select(svgEl)
