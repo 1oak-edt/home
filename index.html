@@ -1005,7 +1005,7 @@
       line-height: 1.75;
     }
 
-    /* Map container — transparent/floating */
+    /* Map container — full section width, no container constraint */
     .map-outer {
       width: 100%;
       overflow: hidden;
@@ -1017,10 +1017,9 @@
     #map-svg {
       display: block;
       width: 100%;
-      height: auto;
       opacity: 0;
       transform: scale(1.10) translateX(32px);
-      /* transition applied only when .map-visible is added */
+      /* height set by JS via attribute — do not override with CSS */
     }
     #map-svg.map-visible {
       opacity: 1;
@@ -1616,15 +1615,13 @@
     </div>
   </div>
 
-  <div class="container" style="max-width:1200px;">
-    <div class="map-outer" id="map-container">
-      <div class="map-loading" id="map-loading">Loading map&hellip;</div>
-      <svg id="map-svg"></svg>
-      <!-- placeholder so the outer div has height before JS fires -->
-      <noscript><p style="padding:40px;color:#5a6350;font-size:13px;">Map requires JavaScript. Active states: AZ, CA, CO, FL, NV, OK, OR, TX, UT, WA.</p></noscript>
-      <!-- !! OLD POLYGON PLACEHOLDERS REMOVED — D3 renders below !! -->
-    </div>
+  <div class="map-outer" id="map-container">
+    <div class="map-loading" id="map-loading">Loading map&hellip;</div>
+    <svg id="map-svg"></svg>
+    <noscript><p style="padding:40px;color:#5a6350;font-size:13px;">Map requires JavaScript. Active states: AZ, CA, CO, FL, NV, OK, OR, TX, UT, WA.</p></noscript>
+  </div>
 
+  <div class="container">
     <div class="map-legend">
       <div class="legend-item">
         <div class="legend-swatch active"></div>
@@ -1671,7 +1668,7 @@
     loading.style.display = 'none';
 
     const W = container.clientWidth || 960;
-    const H = Math.round(W * 0.585);
+    const H = Math.round(W * 0.62);
 
     // Continental US only — exclude Alaska (2) and Hawaii (15)
     const allFeatures = topojson.feature(us, us.objects.states).features;
@@ -1680,7 +1677,7 @@
 
     // geoAlbers (no AK/HI insets) fitted to continental states
     const projection = d3.geoAlbers()
-      .fitExtent([[24, 20], [W - 24, H - 20]], contCollection);
+      .fitExtent([[8, 8], [W - 8, H - 8]], contCollection);
     const path = d3.geoPath().projection(projection);
 
     const svg = d3.select(svgEl)
