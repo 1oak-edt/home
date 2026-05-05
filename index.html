@@ -1062,6 +1062,16 @@
       stroke: #7aaa45;
       animation: ring-expand 2.8s ease-out infinite;
     }
+    @keyframes metro-ring-expand {
+      0%   { r: 2;  stroke-opacity: 0.65; stroke-width: 1.2; }
+      100% { r: 12; stroke-opacity: 0;    stroke-width: 0.3; }
+    }
+    .metro-ring {
+      fill: none;
+      stroke: #7aaa45;
+      animation: metro-ring-expand 2.4s ease-out infinite;
+    }
+    .metro-dot { fill: #e4c386; }
 
     /* Dot + label — tan on dark green, legible */
     .state-dot { fill: #e4c386; }
@@ -1628,6 +1638,13 @@
         Active lending market
       </div>
       <div class="legend-item">
+        <svg width="14" height="14" viewBox="0 0 14 14" style="flex-shrink:0;overflow:visible;">
+          <circle cx="7" cy="7" r="5" fill="none" stroke="#7aaa45" stroke-width="1" stroke-opacity="0.6"/>
+          <circle cx="7" cy="7" r="2" fill="#e4c386"/>
+        </svg>
+        Active lending metro
+      </div>
+      <div class="legend-item">
         <div class="legend-swatch inactive"></div>
         Outside current footprint
       </div>
@@ -1650,6 +1667,24 @@
     48: { abbr: 'TX', delay: 2.80 },
     12: { abbr: 'FL', delay: 3.15 },
   };
+
+  // Active lending metros — [lon, lat] coordinates
+  const METROS = [
+    { name: 'KC',   lon: -94.579, lat: 39.100 },   // Kansas City MO/KS
+    { name: 'IND',  lon: -86.158, lat: 39.768 },   // Indianapolis
+    { name: 'CMH',  lon: -82.999, lat: 39.961 },   // Columbus OH
+    { name: 'CVG',  lon: -84.512, lat: 39.103 },   // Cincinnati
+    { name: 'LOU',  lon: -85.759, lat: 38.253 },   // Louisville
+    { name: 'BNA',  lon: -86.782, lat: 36.163 },   // Nashville
+    { name: 'MEM',  lon: -90.049, lat: 35.150 },   // Memphis
+    { name: 'RDU',  lon: -78.638, lat: 35.780 },   // Raleigh
+    { name: 'QC',   lon: -90.578, lat: 41.524 },   // Quad Cities IA/IL
+    { name: 'BOI',  lon: -116.202, lat: 43.615 },  // Boise
+    { name: 'MSP',  lon: -93.265, lat: 44.978 },   // Minneapolis
+    { name: 'DTW',  lon: -83.046, lat: 42.331 },   // Detroit
+    { name: 'ATL',  lon: -84.388, lat: 33.749 },   // Atlanta
+    { name: 'STL',  lon: -90.199, lat: 38.627 },   // St. Louis
+  ];
 
   // Manual [lon, lat] overrides for states where D3 path.centroid()
   // falls outside the polygon body (irregular coastlines, panhandles).
@@ -1727,6 +1762,33 @@
         .attr('x', cx)
         .attr('y', cy + 10)
         .text(info.abbr);
+    });
+
+    // Metro city markers — smaller ring + gold dot + label
+    METROS.forEach((m, i) => {
+      const pos = projection([m.lon, m.lat]);
+      if (!pos || isNaN(pos[0]) || isNaN(pos[1])) return;
+      const [cx, cy] = pos;
+      const delay = i * 0.18;
+
+      [0, 1.2].forEach(offset => {
+        svg.append('circle')
+          .attr('class', 'metro-ring')
+          .attr('cx', cx).attr('cy', cy)
+          .attr('r', 2)
+          .style('animation-delay', (delay + offset) + 's');
+      });
+
+      svg.append('circle')
+        .attr('class', 'metro-dot')
+        .attr('cx', cx).attr('cy', cy)
+        .attr('r', 1.7);
+
+      svg.append('text')
+        .attr('class', 'map-label')
+        .attr('x', cx)
+        .attr('y', cy + 9)
+        .text(m.name);
     });
 
     // Pan-in on scroll — trigger once when section enters viewport
