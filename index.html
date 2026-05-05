@@ -1072,6 +1072,16 @@
       animation: metro-ring-expand 2.4s ease-out infinite;
     }
     .metro-dot { fill: #e4c386; }
+    .metro-label {
+      font-family: 'Fragment Mono', monospace;
+      font-size: 8px;
+      fill: #232c17;
+      text-anchor: middle;
+      dominant-baseline: auto;
+      pointer-events: none;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+    }
 
     /* Dot + label — tan on dark green, legible */
     .state-dot { fill: #e4c386; }
@@ -1785,7 +1795,7 @@
         .attr('r', 1.7);
 
       svg.append('text')
-        .attr('class', 'map-label')
+        .attr('class', 'metro-label')
         .attr('x', cx)
         .attr('y', cy + 9)
         .text(m.name);
