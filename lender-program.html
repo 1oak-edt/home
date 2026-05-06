@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Discretionary Note Acquisitions — 1Oak Lending</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Quattrocento:wght@400;700&family=Barlow+Condensed:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Fragment+Mono&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── Tokens ─────────────────────────────────────────────── */
+    :root {
+      --forest:      #232c17;
+      --forest-deep: #191f10;
+      --forest-mid:  #2e3b1d;
+      --forest-muted:rgba(35,44,23,0.06);
+      --tan:         #e4c386;
+      --tan-light:   #edd9a3;
+      --tan-dim:     rgba(228,195,134,0.18);
+      --tan-border:  rgba(228,195,134,0.30);
+      --cream:       #fafaf8;
+      --cream-dark:  #f3f0eb;
+      --white:       #ffffff;
+      --text:        #1c2211;
+      --text-muted:  #5a6350;
+      --text-faint:  #9aaa88;
+      --border:      #e0ddd6;
+      --rule:        rgba(35,44,23,0.10);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Barlow', sans-serif;
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--text);
+      background: var(--cream);
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 48px;
+    }
+    .eyebrow {
+      font-family: 'Fragment Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--tan);
+      display: block;
+      margin-bottom: 20px;
+    }
+    .eyebrow-dark { color: var(--text-muted); }
+
+    /* ── NAV ────────────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      inset: 0 0 auto 0;
+      z-index: 200;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      background: rgba(250,250,248,0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--rule);
+      transition: box-shadow 0.3s;
+    }
+    nav.scrolled { box-shadow: 0 2px 24px rgba(35,44,23,0.08); }
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 48px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      font-family: 'Quattrocento', serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--forest);
+      letter-spacing: -0.01em;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-family: 'Barlow', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--forest); }
+    .nav-cta {
+      background: var(--forest);
+      color: var(--cream) !important;
+      padding: 9px 22px;
+      border-radius: 100px;
+      font-size: 13px !important;
+      font-weight: 500 !important;
+      letter-spacing: 0.03em !important;
+      transition: background 0.2s !important;
+    }
+    .nav-cta:hover { background: var(--forest-mid) !important; color: var(--tan-light) !important; }
+
+    /* ── HERO ───────────────────────────────────────────────── */
+    #hero {
+      background: var(--forest-deep);
+      padding: 140px 0 100px;
+      position: relative;
+      overflow: hidden;
+    }
+    #hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: 0.4;
+      pointer-events: none;
+    }
+    #hero::after {
+      content: '1Oak';
+      position: absolute;
+      bottom: -40px;
+      right: -20px;
+      font-family: 'Quattrocento', serif;
+      font-size: clamp(160px, 20vw, 300px);
+      font-weight: 700;
+      color: rgba(255,255,255,0.025);
+      line-height: 1;
+      letter-spacing: -0.04em;
+      pointer-events: none;
+      user-select: none;
+    }
+    .hero-content { position: relative; z-index: 1; }
+    .hero-content h1 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(52px, 7vw, 96px);
+      font-weight: 600;
+      line-height: 0.95;
+      color: var(--cream);
+      letter-spacing: -0.01em;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+    .hero-content h1 em {
+      font-family: 'Quattrocento', serif;
+      font-style: italic;
+      font-weight: 400;
+      color: var(--tan);
+      text-transform: none;
+      font-size: 0.88em;
+    }
+    .hero-content p {
+      font-size: 17px;
+      font-weight: 300;
+      color: rgba(250,250,248,0.55);
+      max-width: 580px;
+      line-height: 1.75;
+    }
+    .hero-badges {
+      display: flex;
+      gap: 12px;
+      margin-top: 36px;
+      flex-wrap: wrap;
+    }
+    .hero-badge {
+      font-family: 'Fragment Mono', monospace;
+      font-size: 9.5px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(250,250,248,0.35);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 7px 16px;
+      border-radius: 100px;
+    }
+
+    /* ── STAT BAR ───────────────────────────────────────────── */
+    #stat-bar {
+      background: var(--tan);
+      padding: 0;
+    }
+    .stat-bar-inner {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .stat-item {
+      padding: 44px 48px;
+      border-right: 1px solid rgba(35,44,23,0.15);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-item .stat-val {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(36px, 4vw, 52px);
+      font-weight: 700;
+      color: var(--forest-deep);
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .stat-item .stat-label {
+      font-family: 'Fragment Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--forest);
+      opacity: 0.6;
+    }
+    .stat-item .stat-sub {
+      font-size: 13px;
+      font-weight: 300;
+      color: var(--forest);
+      opacity: 0.65;
+      line-height: 1.6;
+      margin-top: 4px;
+    }
+
+    /* ── VALUE PROP ─────────────────────────────────────────── */
+    #value-prop {
+      background: var(--cream);
+      padding: 110px 0 100px;
+    }
+    .vp-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+    .vp-left h2 {
+      font-family: 'Quattrocento', serif;
+      font-size: clamp(30px, 3.5vw, 46px);
+      font-weight: 700;
+      color: var(--forest);
+      line-height: 1.15;
+      margin-bottom: 24px;
+    }
+    .vp-left p {
+      font-size: 15px;
+      font-weight: 300;
+      color: var(--text-muted);
+      line-height: 1.8;
+      margin-bottom: 16px;
+    }
+    .vp-callout {
+      margin-top: 32px;
+      background: var(--cream-dark);
+      border-left: 3px solid var(--tan);
+      border-radius: 0 4px 4px 0;
+      padding: 20px 24px;
+    }
+    .vp-callout p {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--forest);
+      line-height: 1.65;
+      margin: 0;
+    }
+    .vp-right {
+      border-top: 1px solid var(--rule);
+    }
+    .vp-item {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      padding: 28px 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    .vp-num {
+      font-family: 'Fragment Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      color: var(--tan);
+      padding-top: 4px;
+      flex-shrink: 0;
+      width: 28px;
+    }
+    .vp-item h4 {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--forest);
+      margin-bottom: 6px;
+    }
+    .vp-item p {
+      font-size: 13.5px;
+      font-weight: 300;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    /* ── PROCESS ────────────────────────────────────────────── */
+    #process {
+      background: var(--forest);
+      padding: 110px 0 100px;
+    }
+    .process-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: end;
+      margin-bottom: 72px;
+    }
+    .process-header h2 {
+      font-family: 'Quattrocento', serif;
+      font-size: clamp(30px, 3.5vw, 46px);
+      font-weight: 700;
+      color: var(--cream);
+      line-height: 1.15;
+    }
+    .process-header p {
+      font-size: 15px;
+      font-weight: 300;
+      color: rgba(250,250,248,0.45);
+      line-height: 1.8;
+    }
+    .process-track {
+      position: relative;
+    }
+    .process-track::before {
+      content: '';
+      position: absolute;
+      top: 28px;
+      left: 28px;
+      right: 28px;
+      height: 1px;
+      background: rgba(255,255,255,0.08);
+    }
+    .process-steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      position: relative;
+      z-index: 1;
+    }
+    .p-step {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 6px;
+      padding: 32px 28px 36px;
+    }
+    .p-step-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .p-step-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--tan);
+      flex-shrink: 0;
+    }
+    .p-step-num {
+      font-family: 'Fragment Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      color: rgba(250,250,248,0.25);
+    }
+    .p-step h4 {
+      font-family: 'Barlow', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--cream);
+      margin-bottom: 10px;
+      line-height: 1.3;
+    }
+    .p-step p {
+      font-size: 13px;
+      font-weight: 300;
+      color: rgba(250,250,248,0.38);
+      line-height: 1.75;
+    }
+    .p-step-sla {
+      display: inline-block;
+      margin-top: 16px;
+      font-family: 'Fragment Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--tan);
+      opacity: 0.7;
+      border: 1px solid rgba(228,195,134,0.2);
+      padding: 5px 12px;
+      border-radius: 100px;
+    }
+
+    /* ── WHAT WE ACQUIRE ─────────────────────────────────────── */
+    #what-we-buy {
+      background: var(--cream-dark);
+      padding: 110px 0 100px;
+    }
+    .wwb-header {
+      margin-bottom: 64px;
+      max-width: 640px;
+    }
+    .wwb-header h2 {
+      font-family: 'Quattrocento', serif;
+      font-size: clamp(30px, 3.5vw, 46px);
+      font-weight: 700;
+      color: var(--forest);
+      line-height: 1.15;
+      margin-top: 4px;
+    }
+    .wwb-header p {
+      font-size: 15px;
+      font-weight: 300;
+      color: var(--text-muted);
+      line-height: 1.8;
+      margin-top: 16px;
+    }
+    .asset-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .asset-tile {
+      background: var(--cream);
+      padding: 32px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .asset-tile-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--tan-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 4px;
+    }
+    .asset-tile-icon svg { width: 16px; height: 16px; }
+    .asset-tile h4 {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--forest);
+    }
+    .asset-tile p {
+      font-size: 12.5px;
+      font-weight: 300;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    /* ── SUBMISSION FORM ─────────────────────────────────────── */
+    #submit {
+      background: var(--forest-deep);
+      padding: 110px 0 100px;
+      position: relative;
+      overflow: hidden;
+    }
+    #submit::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: 0.35;
+      pointer-events: none;
+    }
+    .submit-inner { position: relative; z-index: 1; }
+    .submit-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+      margin-bottom: 64px;
+    }
+    .submit-header h2 {
+      font-family: 'Quattrocento', serif;
+      font-size: clamp(30px, 3.5vw, 46px);
+      font-weight: 700;
+      color: var(--cream);
+      line-height: 1.15;
+    }
+    .submit-header p {
+      font-size: 15px;
+      font-weight: 300;
+      color: rgba(250,250,248,0.42);
+      line-height: 1.8;
+      padding-top: 8px;
+    }
+
+    /* Form */
+    .form-section-label {
+      font-family: 'Fragment Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--tan);
+      opacity: 0.65;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .form-block { margin-bottom: 40px; }
+    .form-wrap { display: flex; flex-direction: column; gap: 16px; }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .form-row.triple { grid-template-columns: 1fr 1fr 1fr; }
+    .form-row.single { grid-template-columns: 1fr; }
+    .fg { display: flex; flex-direction: column; gap: 6px; }
+    .fg label {
+      font-family: 'Fragment Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(250,250,248,0.28);
+    }
+    .fg label .req { color: var(--tan); opacity: 0.6; margin-left: 3px; }
+    .fg input,
+    .fg select,
+    .fg textarea {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 4px;
+      color: var(--cream);
+      font-family: 'Barlow', sans-serif;
+      font-size: 14px;
+      font-weight: 300;
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+      width: 100%;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .fg select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23e4c386' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+      cursor: pointer;
+    }
+    .fg select option { background: #191f10; color: var(--cream); }
+    .fg input:focus,
+    .fg select:focus,
+    .fg textarea:focus {
+      border-color: rgba(228,195,134,0.45);
+      background: rgba(228,195,134,0.04);
+    }
+    .fg input::placeholder,
+    .fg textarea::placeholder { color: rgba(250,250,248,0.18); }
+    .fg textarea { resize: vertical; min-height: 110px; }
+    .optional-divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 8px 0 4px;
+    }
+    .optional-divider span {
+      font-family: 'Fragment Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(250,250,248,0.22);
+      white-space: nowrap;
+    }
+    .optional-divider::before,
+    .optional-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,0.06);
+    }
+    .form-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-top: 32px;
+      flex-wrap: wrap;
+    }
+    .form-disclaimer {
+      font-size: 11.5px;
+      font-weight: 300;
+      color: rgba(250,250,248,0.2);
+      max-width: 420px;
+      line-height: 1.65;
+    }
+    .btn-submit {
+      background: var(--tan);
+      color: var(--forest-deep);
+      font-family: 'Barlow', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 14px 36px;
+      border-radius: 100px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-submit:hover { background: var(--tan-light); transform: translateY(-1px); }
+
+    /* ── FOOTER ─────────────────────────────────────────────── */
+    footer {
+      background: var(--forest);
+      padding: 64px 0 40px;
+    }
+    .footer-top {
+      display: grid;
+      grid-template-columns: 2.5fr 1fr 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 56px;
+    }
+    .footer-brand .footer-logo {
+      font-family: 'Quattrocento', serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--cream);
+      margin-bottom: 16px;
+    }
+    .footer-brand p {
+      font-size: 13px;
+      font-weight: 300;
+      color: rgba(250,250,248,0.35);
+      line-height: 1.75;
+      max-width: 280px;
+    }
+    .footer-col h5 {
+      font-family: 'Fragment Mono', monospace;
+      font-size: 9.5px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--tan);
+      margin-bottom: 20px;
+      opacity: 0.75;
+    }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-col ul a {
+      font-size: 13.5px;
+      font-weight: 300;
+      color: rgba(250,250,248,0.4);
+      transition: color 0.2s;
+    }
+    .footer-col ul a:hover { color: var(--cream); }
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .footer-bottom p {
+      font-family: 'Fragment Mono', monospace;
+      font-size: 10.5px;
+      color: rgba(250,250,248,0.2);
+      letter-spacing: 0.04em;
+    }
+    .footer-tagline {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 14px;
+      font-style: italic;
+      font-weight: 300;
+      color: rgba(250,250,248,0.25);
+    }
+
+    /* ── RESPONSIVE ─────────────────────────────────────────── */
+    @media (max-width: 1024px) {
+      .vp-grid,
+      .process-header,
+      .submit-header { grid-template-columns: 1fr; gap: 48px; }
+      .process-steps { grid-template-columns: 1fr 1fr; }
+      .asset-grid { grid-template-columns: 1fr 1fr; }
+      .stat-bar-inner { grid-template-columns: 1fr; }
+      .stat-item { border-right: none; border-bottom: 1px solid rgba(35,44,23,0.15); }
+      .stat-item:last-child { border-bottom: none; }
+      .footer-top { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 768px) {
+      .container { padding: 0 24px; }
+      .nav-links { display: none; }
+      #hero { padding: 120px 0 80px; }
+      .process-steps { grid-template-columns: 1fr; }
+      .asset-grid { grid-template-columns: 1fr; }
+      .form-row,
+      .form-row.triple { grid-template-columns: 1fr; }
+      .footer-top { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ──────────────────────────────────────────────────── -->
+<nav id="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">1Oak Lending</a>
+    <ul class="nav-links">
+      <li><a href="index.html#about">About</a></li>
+      <li><a href="index.html#programs">Programs</a></li>
+      <li><a href="index.html#process">Process</a></li>
+      <li><a href="index.html#team">Team</a></li>
+      <li><a href="#submit" class="nav-cta">Submit an Asset</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ── HERO ─────────────────────────────────────────────────── -->
+<section id="hero">
+  <div class="container">
+    <div class="hero-content">
+      <span class="eyebrow">Lender Partner Program</span>
+      <h1>Discretionary<br><em>Note Acquisitions</em></h1>
+      <p>1Oak Lending provides banks, credit unions, and institutional lenders a confidential, efficient channel to move CRE notes and distressed assets off the balance sheet — without disrupting borrower relationships or triggering public market exposure.</p>
+      <div class="hero-badges">
+        <span class="hero-badge">Non-Performing Notes</span>
+        <span class="hero-badge">Sub-Performing Notes</span>
+        <span class="hero-badge">REO Assets</span>
+        <span class="hero-badge">Performing Note Sales</span>
+        <span class="hero-badge">Portfolio Dispositions</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── STAT BAR ──────────────────────────────────────────────── -->
+<div id="stat-bar">
+  <div class="container" style="padding:0;">
+    <div class="stat-bar-inner">
+      <div class="stat-item">
+        <span class="stat-val">48–72<span style="font-size:0.55em;letter-spacing:-0.01em;">hrs</span></span>
+        <span class="stat-label">Term Sheet Turnaround</span>
+        <span class="stat-sub">Formal term sheet issued within 48–72 hours of a complete submission.</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-val">$1M–$25M</span>
+        <span class="stat-label">Acquisition Range</span>
+        <span class="stat-sub">Single assets and small note portfolios across all major CRE property types.</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-val">100%</span>
+        <span class="stat-label">Discretionary</span>
+        <span class="stat-sub">All submissions are handled with full confidentiality. No public marketing or broker exposure.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── VALUE PROP ────────────────────────────────────────────── -->
+<section id="value-prop">
+  <div class="container">
+    <div class="vp-grid">
+      <div class="vp-left">
+        <span class="eyebrow eyebrow-dark">Why 1Oak</span>
+        <h2>A quiet, capable buyer — ready to move when you are.</h2>
+        <p>Regulatory pressure, concentration limits, CECL reserves, and matured loan workouts create real urgency to move CRE credit off the balance sheet. Finding the right buyer — one who underwrites quickly, closes reliably, and doesn't disrupt your institution or borrower relationships — is rarely straightforward.</p>
+        <p>1Oak is a discretionary, family-office-backed acquirer. We underwrite internally, require no financing contingencies, and operate with institutional confidentiality at every stage. When you submit an asset, you deal directly with our principals.</p>
+        <div class="vp-callout">
+          <p>Submissions are reviewed by our credit team within 24 hours. A formal indication of interest or term sheet follows within 48–72 hours of receiving complete deal information.</p>
+        </div>
+      </div>
+      <div class="vp-right">
+        <div class="vp-item">
+          <span class="vp-num">01</span>
+          <div>
+            <h4>No Financing Contingencies</h4>
+            <p>1Oak acquires notes and REO with committed capital. There are no third-party financing requirements, no syndication delays, and no closing contingencies tied to capital raises.</p>
+          </div>
+        </div>
+        <div class="vp-item">
+          <span class="vp-num">02</span>
+          <div>
+            <h4>Full Confidentiality</h4>
+            <p>We do not market assets publicly or engage outside brokers without your express authorization. Your institution, your borrower, and the asset stay entirely out of the market.</p>
+          </div>
+        </div>
+        <div class="vp-item">
+          <span class="vp-num">03</span>
+          <div>
+            <h4>Fast, Formal Underwriting</h4>
+            <p>Our credit team reviews every submission against a consistent underwriting framework. You receive a formal written indication of interest — not a phone call — within 48–72 hours.</p>
+          </div>
+        </div>
+        <div class="vp-item">
+          <span class="vp-num">04</span>
+          <div>
+            <h4>Flexible on Structure</h4>
+            <p>We can acquire the note outright, participate alongside your institution, or structure a preferred equity or mezzanine solution depending on your balance sheet objective.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PROCESS ───────────────────────────────────────────────── -->
+<section id="process">
+  <div class="container">
+    <div class="process-header">
+      <div>
+        <span class="eyebrow">The Process</span>
+        <h2>From submission to term sheet in under 72 hours.</h2>
+      </div>
+      <p>We've designed a streamlined process specifically for institutional counterparties. No lengthy intake calls, no NDAs required to receive terms — just a straightforward path from first submission to formal offer.</p>
+    </div>
+    <div class="process-track">
+      <div class="process-steps">
+        <div class="p-step">
+          <div class="p-step-top">
+            <div class="p-step-dot"></div>
+            <span class="p-step-num">Step 01</span>
+          </div>
+          <h4>Submit Asset Details</h4>
+          <p>Complete the secure submission form below. Provide note balance, property information, borrower status, and any relevant financials. The more complete the submission, the faster our review.</p>
+          <span class="p-step-sla">Immediate Confirmation</span>
+        </div>
+        <div class="p-step">
+          <div class="p-step-top">
+            <div class="p-step-dot"></div>
+            <span class="p-step-num">Step 02</span>
+          </div>
+          <h4>Credit Team Review</h4>
+          <p>Our principals and credit team review the submission against our acquisition criteria. We may reach out with targeted follow-up questions to ensure a complete underwriting picture.</p>
+          <span class="p-step-sla">Within 24 Hours</span>
+        </div>
+        <div class="p-step">
+          <div class="p-step-top">
+            <div class="p-step-dot"></div>
+            <span class="p-step-num">Step 03</span>
+          </div>
+          <h4>Formal Term Sheet</h4>
+          <p>We issue a formal written term sheet outlining purchase price, structure, timeline, and any outstanding diligence requirements. No verbal indications — you receive a document.</p>
+          <span class="p-step-sla">48–72 Hours from Submission</span>
+        </div>
+        <div class="p-step">
+          <div class="p-step-top">
+            <div class="p-step-dot"></div>
+            <span class="p-step-num">Step 04</span>
+          </div>
+          <h4>Diligence &amp; Close</h4>
+          <p>Upon acceptance of terms, we move into a focused diligence period followed by closing. We work to your timeline and maintain full confidentiality through close and beyond.</p>
+          <span class="p-step-sla">Determined at Term Sheet</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── WHAT WE ACQUIRE ───────────────────────────────────────── -->
+<section id="what-we-buy">
+  <div class="container">
+    <div class="wwb-header">
+      <span class="eyebrow eyebrow-dark">Acquisition Criteria</span>
+      <h2>What we acquire.</h2>
+      <p>We evaluate CRE notes and assets across a broad range of property types, note statuses, and deal structures. The common thread is transitional collateral with a clear path to resolution — whether through payoff, stabilization, or sale.</p>
+    </div>
+    <div class="asset-grid">
+      <div class="asset-tile">
+        <div class="asset-tile-icon">
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 13V7l6-4 6 4v6M6 13V9h4v4" stroke="#232c17" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h4>Non-Performing Notes (NPNs)</h4>
+        <p>Loans in default, matured loans, or loans in workout where resolution has stalled. We underwrite to collateral value and form a clear resolution strategy.</p>
+      </div>
+      <div class="asset-tile">
+        <div class="asset-tile-icon">
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 2v12M2 8h12" stroke="#232c17" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h4>Sub-Performing Notes</h4>
+        <p>Loans with partial payment, forbearance agreements, or borrowers in financial stress — where continued workout is consuming institutional resources.</p>
+      </div>
+      <div class="asset-tile">
+        <div class="asset-tile-icon">
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M13 5H3a1 1 0 00-1 1v6a1 1 0 001 1h10a1 1 0 001-1V6a1 1 0 00-1-1zM2 8h12M5 5V4a1 1 0 011-1h4a1 1 0 011 1v1" stroke="#232c17" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h4>REO Assets</h4>
+        <p>Real estate acquired through foreclosure that the institution needs to move off the balance sheet. We transact on an as-is basis and close without sale contingencies.</p>
+      </div>
+      <div class="asset-tile">
+        <div class="asset-tile-icon">
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 11V5l6-3 6 3v6l-6 3-6-3z" stroke="#232c17" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h4>Performing Note Sales</h4>
+        <p>Institutions managing concentration risk, exiting a market, or seeking to deleverage a CRE book without triggering credit concerns. We acquire with full confidentiality.</p>
+      </div>
+      <div class="asset-tile">
+        <div class="asset-tile-icon">
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 4h10M3 8h10M3 12h6" stroke="#232c17" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h4>Construction &amp; ADC Loans</h4>
+        <p>Stalled construction, failed spec development, or acquisition / development / construction loans where the project has deviated from the original business plan.</p>
+      </div>
+      <div class="asset-tile">
+        <div class="asset-tile-icon">
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="8" cy="8" r="6" stroke="#232c17" stroke-width="1.3"/>
+            <path d="M8 5v3l2 2" stroke="#232c17" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h4>Matured &amp; Extended Loans</h4>
+        <p>Bridge or term loans past their maturity date where refinance hasn't materialized and continued extensions are no longer viable from a regulatory or credit standpoint.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SUBMISSION FORM ────────────────────────────────────────── -->
+<section id="submit">
+  <div class="container">
+    <div class="submit-inner">
+      <div class="submit-header">
+        <h2>Submit an Asset<br>or Note</h2>
+        <p>Complete the form below to initiate a confidential review. All fields marked with an asterisk are required for an initial assessment. Additional diligence materials can be shared once we've issued a preliminary indication of interest.</p>
+      </div>
+
+      <form id="lender-form" autocomplete="off">
+
+        <!-- Institution Information -->
+        <div class="form-block">
+          <p class="form-section-label">Submitting Institution</p>
+          <div class="form-wrap">
+            <div class="form-row">
+              <div class="fg">
+                <label for="l-inst">Institution Name <span class="req">*</span></label>
+                <input type="text" id="l-inst" name="institution_name" placeholder="Bank, credit union, or firm name" required />
+              </div>
+              <div class="fg">
+                <label for="l-itype">Institution Type <span class="req">*</span></label>
+                <select id="l-itype" name="institution_type" required>
+                  <option value="" disabled selected>Select type</option>
+                  <option>Community Bank</option>
+                  <option>Regional Bank</option>
+                  <option>National Bank</option>
+                  <option>Credit Union</option>
+                  <option>CMBS / Special Servicer</option>
+                  <option>Private Lender / Debt Fund</option>
+                  <option>Insurance Company</option>
+                  <option>Government / Agency</option>
+                  <option>Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row triple">
+              <div class="fg">
+                <label for="l-cname">Contact Name <span class="req">*</span></label>
+                <input type="text" id="l-cname" name="contact_name" placeholder="Full name" required />
+              </div>
+              <div class="fg">
+                <label for="l-ctitle">Title / Role <span class="req">*</span></label>
+                <input type="text" id="l-ctitle" name="contact_title" placeholder="e.g. Chief Credit Officer" required />
+              </div>
+              <div class="fg">
+                <label for="l-state">State <span class="req">*</span></label>
+                <select id="l-state" name="institution_state" required>
+                  <option value="" disabled selected>Select state</option>
+                  <option>AL</option><option>AK</option><option>AZ</option><option>AR</option>
+                  <option>CA</option><option>CO</option><option>CT</option><option>DE</option>
+                  <option>FL</option><option>GA</option><option>HI</option><option>ID</option>
+                  <option>IL</option><option>IN</option><option>IA</option><option>KS</option>
+                  <option>KY</option><option>LA</option><option>ME</option><option>MD</option>
+                  <option>MA</option><option>MI</option><option>MN</option><option>MS</option>
+                  <option>MO</option><option>MT</option><option>NE</option><option>NV</option>
+                  <option>NH</option><option>NJ</option><option>NM</option><option>NY</option>
+                  <option>NC</option><option>ND</option><option>OH</option><option>OK</option>
+                  <option>OR</option><option>PA</option><option>RI</option><option>SC</option>
+                  <option>SD</option><option>TN</option><option>TX</option><option>UT</option>
+                  <option>VT</option><option>VA</option><option>WA</option><option>WV</option>
+                  <option>WI</option><option>WY</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="fg">
+                <label for="l-email">Email Address <span class="req">*</span></label>
+                <input type="email" id="l-email" name="email" placeholder="contact@institution.com" required />
+              </div>
+              <div class="fg">
+                <label for="l-phone">Direct Phone <span class="req">*</span></label>
+                <input type="tel" id="l-phone" name="phone" placeholder="(000) 000-0000" required />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Note / Asset Information -->
+        <div class="form-block">
+          <p class="form-section-label">Note &amp; Asset Information</p>
+          <div class="form-wrap">
+            <div class="form-row">
+              <div class="fg">
+                <label for="l-addr">Property Address <span class="req">*</span></label>
+                <input type="text" id="l-addr" name="property_address" placeholder="Street address, city, state" required />
+              </div>
+              <div class="fg">
+                <label for="l-ptype">Asset / Property Type <span class="req">*</span></label>
+                <select id="l-ptype" name="asset_type" required>
+                  <option value="" disabled selected>Select type</option>
+                  <option>Multifamily</option>
+                  <option>Office</option>
+                  <option>Retail / Mixed-Use</option>
+                  <option>Industrial / Flex</option>
+                  <option>Hospitality</option>
+                  <option>Self-Storage</option>
+                  <option>Land / Ground-Up</option>
+                  <option>Single-Tenant NNN</option>
+                  <option>Senior Housing / Healthcare</option>
+                  <option>Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row triple">
+              <div class="fg">
+                <label for="l-nbal">Current Note Balance <span class="req">*</span></label>
+                <input type="text" id="l-nbal" name="note_balance" placeholder="e.g. $4,250,000" required />
+              </div>
+              <div class="fg">
+                <label for="l-orig">Original Loan Amount</label>
+                <input type="text" id="l-orig" name="original_loan_amount" placeholder="e.g. $5,000,000" />
+              </div>
+              <div class="fg">
+                <label for="l-origdate">Loan Origination Date</label>
+                <input type="text" id="l-origdate" name="origination_date" placeholder="MM/YYYY" />
+              </div>
+            </div>
+            <div class="form-row triple">
+              <div class="fg">
+                <label for="l-maturity">Maturity Date <span class="req">*</span></label>
+                <input type="text" id="l-maturity" name="maturity_date" placeholder="MM/YYYY or Matured" required />
+              </div>
+              <div class="fg">
+                <label for="l-rate">Interest Rate</label>
+                <input type="text" id="l-rate" name="interest_rate" placeholder="e.g. 6.50%" />
+              </div>
+              <div class="fg">
+                <label for="l-ltv">Estimated Current LTV</label>
+                <input type="text" id="l-ltv" name="current_ltv" placeholder="e.g. 68%" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="fg">
+                <label for="l-nstatus">Note Status <span class="req">*</span></label>
+                <select id="l-nstatus" name="note_status" required>
+                  <option value="" disabled selected>Select status</option>
+                  <option>Performing — For Sale</option>
+                  <option>Sub-Performing (Partial Payments)</option>
+                  <option>Non-Performing (NPN)</option>
+                  <option>Matured / Extended</option>
+                  <option>In Workout / Forbearance</option>
+                  <option>Pre-Foreclosure / NOD Filed</option>
+                  <option>Post-Foreclosure (REO)</option>
+                </select>
+              </div>
+              <div class="fg">
+                <label for="l-borr">Borrower Cooperation Status <span class="req">*</span></label>
+                <select id="l-borr" name="borrower_status" required>
+                  <option value="" disabled selected>Select status</option>
+                  <option>Cooperative / Engaged</option>
+                  <option>Partially Cooperative</option>
+                  <option>Uncooperative / Adversarial</option>
+                  <option>Unknown / No Contact</option>
+                  <option>N/A (REO)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Collateral & Property Details -->
+        <div class="form-block">
+          <p class="form-section-label">Collateral &amp; Property Details</p>
+          <div class="form-wrap">
+            <div class="form-row triple">
+              <div class="fg">
+                <label for="l-occ">Current Occupancy</label>
+                <input type="text" id="l-occ" name="occupancy" placeholder="e.g. 72% or Vacant" />
+              </div>
+              <div class="fg">
+                <label for="l-appraisal">Most Recent Appraisal Value</label>
+                <input type="text" id="l-appraisal" name="appraisal_value" placeholder="e.g. $6,500,000" />
+              </div>
+              <div class="fg">
+                <label for="l-appdate">Appraisal Date</label>
+                <input type="text" id="l-appdate" name="appraisal_date" placeholder="MM/YYYY" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="fg">
+                <label for="l-env">Known Environmental Issues</label>
+                <select id="l-env" name="environmental">
+                  <option value="" disabled selected>Select</option>
+                  <option>None known</option>
+                  <option>Phase I completed — clean</option>
+                  <option>Phase I completed — issues noted</option>
+                  <option>Phase II completed</option>
+                  <option>Active remediation</option>
+                  <option>Unknown</option>
+                </select>
+              </div>
+              <div class="fg">
+                <label for="l-title">Title / Lien Issues</label>
+                <select id="l-title" name="title_issues">
+                  <option value="" disabled selected>Select</option>
+                  <option>Clean title</option>
+                  <option>Junior liens present</option>
+                  <option>Tax liens / assessments</option>
+                  <option>Title dispute or cloud</option>
+                  <option>Unknown</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Transaction Parameters -->
+        <div class="form-block">
+          <p class="form-section-label">Transaction Parameters</p>
+          <div class="form-wrap">
+            <div class="form-row triple">
+              <div class="fg">
+                <label for="l-ask">Asking Price / Bid Guidance</label>
+                <input type="text" id="l-ask" name="asking_price" placeholder="e.g. $3,200,000 or Par" />
+              </div>
+              <div class="fg">
+                <label for="l-timeline">Preferred Closing Timeline <span class="req">*</span></label>
+                <select id="l-timeline" name="timeline" required>
+                  <option value="" disabled selected>Select timeline</option>
+                  <option>ASAP — under 30 days</option>
+                  <option>30–60 days</option>
+                  <option>60–90 days</option>
+                  <option>Flexible / To be determined</option>
+                </select>
+              </div>
+              <div class="fg">
+                <label for="l-struct">Preferred Structure</label>
+                <select id="l-struct" name="preferred_structure">
+                  <option value="" disabled selected>Select structure</option>
+                  <option>Outright note sale</option>
+                  <option>REO sale</option>
+                  <option>Participation / Co-lender</option>
+                  <option>Payoff / Note discount</option>
+                  <option>Open to discussion</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row single">
+              <div class="fg">
+                <label for="l-summary">Asset Summary &amp; Additional Context <span class="req">*</span></label>
+                <textarea id="l-summary" name="summary" placeholder="Describe the asset, borrower background, current workout status, business plan (if any), and any relevant context that would help our credit team conduct a complete initial review." required></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-footer">
+          <p class="form-disclaimer">All submissions are treated as strictly confidential. Information provided will only be used for internal credit review purposes and will not be shared with any third party without your express written authorization.</p>
+          <button type="submit" class="btn-submit">Submit for Review →</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ─────────────────────────────────────────────────── -->
+<footer>
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="footer-logo">1Oak Lending</div>
+        <p>A vertically integrated, family-backed investment firm. Short-term, senior-secured commercial real estate lending and strategic investments.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Company</h5>
+        <ul>
+          <li><a href="index.html#about">About</a></li>
+          <li><a href="index.html#team">Team</a></li>
+          <li><a href="index.html#geography">Markets</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Programs</h5>
+        <ul>
+          <li><a href="index.html#programs">Acquisition Loan</a></li>
+          <li><a href="index.html#programs">Bridge Loan</a></li>
+          <li><a href="index.html#programs">Construction Loan</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Contact</h5>
+        <ul>
+          <li><a href="index.html#submit">Submit a Deal</a></li>
+          <li><a href="tel:7204077117">(720) 407-7117</a></li>
+          <li><a href="mailto:general@1oaklending.com">general@1oaklending.com</a></li>
+          <li><a href="#">LinkedIn</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2024 1Oak Lending. All rights reserved.</p>
+      <span class="footer-tagline">Strategic Capital. Creative Solutions. Investor Driven.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 20);
+  }, { passive: true });
+</script>
+
+</body>
+</html>

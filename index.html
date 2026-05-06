@@ -758,10 +758,70 @@
     /* ── SUBMIT ─────────────────────────────────────────────── */
     #submit {
       background: var(--forest-deep);
-      padding: 110px 0;
+      padding: 110px 0 80px;
       position: relative;
       overflow: hidden;
     }
+
+    /* ── Program blurb cards below submit form ───────────────── */
+    .program-blurbs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 56px;
+      padding-top: 48px;
+      border-top: 1px solid rgba(255,255,255,0.07);
+    }
+    .program-blurb {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 6px;
+      padding: 28px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .program-blurb:hover {
+      background: rgba(255,255,255,0.05);
+      border-color: rgba(228,195,134,0.2);
+    }
+    .program-blurb-eyebrow {
+      font-family: 'Fragment Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--tan);
+      opacity: 0.6;
+    }
+    .program-blurb h4 {
+      font-family: 'Barlow', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--cream);
+      line-height: 1.4;
+    }
+    .program-blurb p {
+      font-size: 13px;
+      font-weight: 300;
+      color: rgba(250,250,248,0.38);
+      line-height: 1.7;
+    }
+    .program-blurb-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--tan);
+      opacity: 0.75;
+      margin-top: 4px;
+      transition: opacity 0.2s, gap 0.2s;
+    }
+    .program-blurb-link:hover { opacity: 1; gap: 9px; }
     #submit::after {
       content: '';
       position: absolute;
@@ -1617,7 +1677,23 @@
           <button type="submit" class="btn-submit">Submit Deal →</button>
         </div>
       </form>
+    </div><!-- /.submit-grid -->
+
+    <div class="program-blurbs">
+      <div class="program-blurb">
+        <span class="program-blurb-eyebrow">Referral &amp; Broker Program</span>
+        <h4>Are you a CRE broker with a book of business that runs into financing hurdles?</h4>
+        <p>When your clients need transitional capital, creative structure, or a lender who can actually close — bring the deal to 1Oak. We handle the financing, you stay close to your client, and earn 1% of the funded loan amount at closing.</p>
+        <a href="broker-program.html" class="program-blurb-link">Learn about the program →</a>
+      </div>
+      <div class="program-blurb">
+        <span class="program-blurb-eyebrow">Lender Partner Program</span>
+        <h4>Are you a bank or credit union looking to move a note or distressed asset off your books?</h4>
+        <p>1Oak provides a discreet, efficient channel for institutional lenders to sell CRE notes and REO assets without market exposure. We underwrite fast and issue a formal term sheet within 48–72 hours of a complete submission.</p>
+        <a href="lender-program.html" class="program-blurb-link">Learn about the program →</a>
+      </div>
     </div>
+
   </div>
 </section>
 
