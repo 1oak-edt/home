@@ -860,7 +860,12 @@
         <p>Register your interest in the 1Oak Referral and Broker Program. All information is kept strictly confidential. Fields marked with an asterisk are required — the deal information section is optional and can be submitted separately once you're onboarded.</p>
       </div>
 
-      <form id="partner-form" autocomplete="off">
+      <form id="partner-form" action="https://api.web3forms.com/submit" method="POST" autocomplete="off">
+        <input type="hidden" name="access_key" value="5a0b18a4-d1d0-490a-9e40-421b75354400">
+        <input type="hidden" name="subject" value="New Broker Partner Application — 1Oak Lending">
+        <input type="hidden" name="from_name" value="1Oak Broker Program">
+        <input type="hidden" name="redirect" value="https://www.1oaklending.com/broker-program?success=1">
+        <input type="checkbox" name="botcheck" style="display:none;">
 
         <!-- Professional Information -->
         <div class="form-block">

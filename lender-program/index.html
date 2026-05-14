@@ -939,7 +939,12 @@
         <p>Complete the form below to initiate a confidential review. All fields marked with an asterisk are required for an initial assessment. Additional diligence materials can be shared once we've issued a preliminary indication of interest.</p>
       </div>
 
-      <form id="lender-form" autocomplete="off">
+      <form id="lender-form" action="https://api.web3forms.com/submit" method="POST" autocomplete="off">
+        <input type="hidden" name="access_key" value="5a0b18a4-d1d0-490a-9e40-421b75354400">
+        <input type="hidden" name="subject" value="New Note Acquisition Submission — 1Oak Lending">
+        <input type="hidden" name="from_name" value="1Oak Lender Partner Program">
+        <input type="hidden" name="redirect" value="https://www.1oaklending.com/lender-program?success=1">
+        <input type="checkbox" name="botcheck" style="display:none;">
 
         <!-- Institution Information -->
         <div class="form-block">
