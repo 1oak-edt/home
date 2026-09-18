@@ -1,5 +1,6 @@
 import { nanoid } from "nanoid";
-import { db } from "./db.js";
+import { db } from "./firebaseAdmin.js";
+import { deleteLeadCascade } from "./firestoreHelpers.js";
 import type { Stage, UseOfProceedsItem } from "./types.js";
 
 interface SeedLead {
@@ -52,41 +53,19 @@ function daysAgo(n: number) {
   return d.toISOString();
 }
 
-const insertLead = db.prepare(`
-  INSERT INTO leads (
-    id, borrower_name, contact_name, contact_email, contact_phone,
-    property_address, city, state, asset_class, loan_type, loan_amount,
-    purchase_price, equity_contribution, interest_rate, term_months,
-    exit_strategy, sponsor_names, use_of_proceeds,
-    stage, prior_stage, lost_reason, source, assigned_to, expected_close_date,
-    notes, created_at, updated_at, stage_changed_at
-  ) VALUES (
-    @id, @borrower_name, @contact_name, @contact_email, @contact_phone,
-    @property_address, @city, @state, @asset_class, @loan_type, @loan_amount,
-    @purchase_price, @equity_contribution, @interest_rate, @term_months,
-    @exit_strategy, @sponsor_names, @use_of_proceeds,
-    @stage, @prior_stage, @lost_reason, @source, @assigned_to, NULL,
-    NULL, @created_at, @updated_at, @stage_changed_at
-  )
-`);
-
-const insertHistory = db.prepare(`
-  INSERT INTO stage_history (id, lead_id, from_stage, to_stage, reason, created_at)
-  VALUES (?, ?, NULL, ?, ?, ?)
-`);
-
-db.exec("BEGIN TRANSACTION");
-try {
-  db.exec("DELETE FROM stage_history");
-  db.exec("DELETE FROM leads");
+async function main() {
+  const existing = await db.collection("leads").get();
+  for (const doc of existing.docs) {
+    await deleteLeadCascade(doc.id);
+  }
 
   for (const l of seedLeads) {
     const id = nanoid();
     const createdAt = daysAgo(l.daysAgoCreated);
     const stageChangedAt = daysAgo(l.daysAgoStageChange);
     const isClosed = l.stage === "Disqualified" || l.stage === "Lost";
-    insertLead.run({
-      id,
+
+    const lead = {
       borrower_name: l.borrower_name,
       contact_name: l.contact_name,
       contact_email: l.contact_email,
@@ -102,23 +81,38 @@ try {
       interest_rate: l.interest_rate,
       term_months: l.term_months,
       exit_strategy: l.exit_strategy,
-      sponsor_names: JSON.stringify(l.sponsor_names),
-      use_of_proceeds: JSON.stringify(l.use_of_proceeds),
+      sponsor_names: l.sponsor_names,
+      use_of_proceeds: l.use_of_proceeds,
+      latitude: null,
+      longitude: null,
+      exec_summary_filename: null,
+      exec_summary_highlights: [],
+      exec_summary_uploaded_at: null,
       stage: l.stage,
       prior_stage: isClosed ? "Qualified" : null,
       lost_reason: l.lost_reason ?? null,
       source: l.source,
       assigned_to: l.assigned_to,
+      expected_close_date: null,
+      notes: null,
       created_at: createdAt,
       updated_at: stageChangedAt,
       stage_changed_at: stageChangedAt,
+    };
+
+    await db.collection("leads").doc(id).set(lead);
+    await db.collection("leads").doc(id).collection("stageHistory").doc(nanoid()).set({
+      from_stage: null,
+      to_stage: l.stage,
+      reason: l.lost_reason ?? null,
+      created_at: stageChangedAt,
     });
-    insertHistory.run(nanoid(), id, l.stage, l.lost_reason ?? null, stageChangedAt);
   }
-  db.exec("COMMIT");
-} catch (err) {
-  db.exec("ROLLBACK");
-  throw err;
+
+  console.log(`Seeded ${seedLeads.length} leads.`);
 }
 
-console.log(`Seeded ${seedLeads.length} leads.`);
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

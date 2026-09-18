@@ -1,6 +1,6 @@
 import cors from "cors";
 import express from "express";
-import "./db.js";
+import "./firebaseAdmin.js";
 import { alertsRouter } from "./routes/alerts.js";
 import { chatRouter } from "./routes/chat.js";
 import { commentsRouter } from "./routes/comments.js";
@@ -26,6 +26,14 @@ app.use("/api/metrics", metricsRouter);
 app.use("/api/alerts", alertsRouter);
 
 app.get("/api/health", (_req, res) => res.json({ ok: true }));
+
+// Final error handler: any error forwarded via next(err) (including from the
+// async route wrapper) lands here as a 500 instead of crashing the process.
+app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  console.error(err);
+  if (res.headersSent) return;
+  res.status(500).json({ error: err instanceof Error ? err.message : "Internal server error" });
+});
 
 app.listen(PORT, () => {
   console.log(`1Oak Tracker API listening on http://localhost:${PORT}`);

@@ -1,48 +1,65 @@
 import { Router } from "express";
 import { z } from "zod";
-import { db } from "../db.js";
+import { ah } from "../asyncHandler.js";
+import { db } from "../firebaseAdmin.js";
 
 export const alertsRouter = Router();
 
-alertsRouter.get("/", (req, res) => {
-  const user = String(req.query.user ?? "");
-  if (!user) return res.status(400).json({ error: "user query param required" });
-  const onlyUnread = req.query.unread === "true";
+// Firestore requires a composite index for `where(recipient==) + orderBy(created_at)`.
+// Rather than depend on a manually-created index, fetch by the single equality
+// filter and sort/filter in memory -- fine at this app's per-user alert volume.
 
-  const rows = db
-    .prepare(
-      `SELECT a.*, l.borrower_name FROM alerts a
-       JOIN leads l ON l.id = a.lead_id
-       WHERE a.recipient = ? ${onlyUnread ? "AND a.read_at IS NULL" : ""}
-       ORDER BY a.created_at DESC
-       LIMIT 100`
-    )
-    .all(user);
-  res.json(rows);
-});
+alertsRouter.get(
+  "/",
+  ah(async (req, res) => {
+    const user = String(req.query.user ?? "");
+    if (!user) return res.status(400).json({ error: "user query param required" });
+    const onlyUnread = req.query.unread === "true";
 
-alertsRouter.get("/unread-count", (req, res) => {
-  const user = String(req.query.user ?? "");
-  if (!user) return res.status(400).json({ error: "user query param required" });
-  const row = db
-    .prepare("SELECT COUNT(*) as count FROM alerts WHERE recipient = ? AND read_at IS NULL")
-    .get(user) as { count: number };
-  res.json({ count: row.count });
-});
+    const snap = await db.collection("alerts").where("recipient", "==", user).get();
+    let alerts = snap.docs.map((d) => ({ id: d.id, ...d.data() })) as any[];
+    if (onlyUnread) alerts = alerts.filter((a) => !a.read_at);
+    alerts.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
+    res.json(alerts.slice(0, 100));
+  })
+);
 
-alertsRouter.post("/:id/read", (req, res) => {
-  db.prepare("UPDATE alerts SET read_at = ? WHERE id = ?").run(new Date().toISOString(), req.params.id);
-  res.status(204).send();
-});
+alertsRouter.get(
+  "/unread-count",
+  ah(async (req, res) => {
+    const user = String(req.query.user ?? "");
+    if (!user) return res.status(400).json({ error: "user query param required" });
+
+    const snap = await db.collection("alerts").where("recipient", "==", user).get();
+    const count = snap.docs.filter((d) => !d.data().read_at).length;
+    res.json({ count });
+  })
+);
+
+alertsRouter.post(
+  "/:id/read",
+  ah<{ id: string }>(async (req, res) => {
+    await db.collection("alerts").doc(req.params.id).update({ read_at: new Date().toISOString() });
+    res.status(204).send();
+  })
+);
 
 const readAllSchema = z.object({ user: z.string().min(1) });
 
-alertsRouter.post("/read-all", (req, res) => {
-  const parsed = readAllSchema.safeParse(req.body);
-  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
-  db.prepare("UPDATE alerts SET read_at = ? WHERE recipient = ? AND read_at IS NULL").run(
-    new Date().toISOString(),
-    parsed.data.user
-  );
-  res.status(204).send();
-});
+alertsRouter.post(
+  "/read-all",
+  ah(async (req, res) => {
+    const parsed = readAllSchema.safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+
+    const snap = await db.collection("alerts").where("recipient", "==", parsed.data.user).get();
+    const unread = snap.docs.filter((d) => !d.data().read_at);
+    if (unread.length) {
+      const batch = db.batch();
+      const read_at = new Date().toISOString();
+      unread.forEach((d) => batch.update(d.ref, { read_at }));
+      await batch.commit();
+    }
+    res.status(204).send();
+  })
+);

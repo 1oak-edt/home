@@ -2,7 +2,8 @@ import { Router } from "express";
 import { nanoid } from "nanoid";
 import { z } from "zod";
 import { createAlerts } from "../alerts.js";
-import { db } from "../db.js";
+import { ah } from "../asyncHandler.js";
+import { db } from "../firebaseAdmin.js";
 import { TASK_STATUSES } from "../types.js";
 
 export const tasksRouter = Router({ mergeParams: true });
@@ -20,78 +21,83 @@ const taskUpdateInput = z.object({
   status: z.enum(TASK_STATUSES).optional(),
 });
 
-tasksRouter.get<{ leadId: string }>("/", (req, res) => {
-  const rows = db
-    .prepare("SELECT * FROM tasks WHERE lead_id = ? ORDER BY created_at ASC")
-    .all(req.params.leadId);
-  res.json(rows);
-});
+function leadTasks(leadId: string) {
+  return db.collection("leads").doc(leadId).collection("tasks");
+}
 
-tasksRouter.post<{ leadId: string }>("/", (req, res) => {
-  const parsed = taskInput.safeParse(req.body);
-  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+tasksRouter.get<{ leadId: string }>(
+  "/",
+  ah<{ leadId: string }>(async (req, res) => {
+    const snap = await leadTasks(req.params.leadId).orderBy("created_at", "asc").get();
+    res.json(snap.docs.map((d) => ({ id: d.id, lead_id: req.params.leadId, ...d.data() })));
+  })
+);
 
-  const id = nanoid();
-  const created_at = new Date().toISOString();
-  db.prepare(
-    `INSERT INTO tasks (id, lead_id, title, assignee, status, created_at, completed_at)
-     VALUES (?, ?, ?, ?, 'Open', ?, NULL)`
-  ).run(id, req.params.leadId, parsed.data.title, parsed.data.assignee ?? null, created_at);
+tasksRouter.post<{ leadId: string }>(
+  "/",
+  ah<{ leadId: string }>(async (req, res) => {
+    const parsed = taskInput.safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
 
-  if (parsed.data.notify?.length) {
-    createAlerts({
-      leadId: req.params.leadId,
-      sourceType: "task",
-      sourceId: id,
-      message: `${parsed.data.created_by ?? "Someone"} added a task: "${parsed.data.title}"${
-        parsed.data.assignee ? ` (assigned to ${parsed.data.assignee})` : ""
-      }`,
-      createdBy: parsed.data.created_by ?? null,
-      recipients: parsed.data.notify,
-    });
-  }
+    const id = nanoid();
+    const created_at = new Date().toISOString();
+    const task = {
+      title: parsed.data.title,
+      assignee: parsed.data.assignee ?? null,
+      status: "Open",
+      created_at,
+      completed_at: null,
+    };
+    await leadTasks(req.params.leadId).doc(id).set(task);
 
-  const row = db.prepare("SELECT * FROM tasks WHERE id = ?").get(id);
-  res.status(201).json(row);
-});
+    if (parsed.data.notify?.length) {
+      await createAlerts({
+        leadId: req.params.leadId,
+        sourceType: "task",
+        sourceId: id,
+        message: `${parsed.data.created_by ?? "Someone"} added a task: "${parsed.data.title}"${
+          parsed.data.assignee ? ` (assigned to ${parsed.data.assignee})` : ""
+        }`,
+        createdBy: parsed.data.created_by ?? null,
+        recipients: parsed.data.notify,
+      });
+    }
 
-tasksRouter.patch<{ leadId: string; taskId: string }>("/:taskId", (req, res) => {
-  const existing = db
-    .prepare("SELECT * FROM tasks WHERE id = ? AND lead_id = ?")
-    .get(req.params.taskId, req.params.leadId) as Record<string, any> | undefined;
-  if (!existing) return res.status(404).json({ error: "Task not found" });
+    res.status(201).json({ id, lead_id: req.params.leadId, ...task });
+  })
+);
 
-  const parsed = taskUpdateInput.safeParse(req.body);
-  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+tasksRouter.patch<{ leadId: string; taskId: string }>(
+  "/:taskId",
+  ah<{ leadId: string; taskId: string }>(async (req, res) => {
+    const ref = leadTasks(req.params.leadId).doc(req.params.taskId);
+    const existing = await ref.get();
+    if (!existing.exists) return res.status(404).json({ error: "Task not found" });
 
-  const merged = { ...existing, ...parsed.data };
-  const completed_at =
-    parsed.data.status === "Done"
-      ? existing.completed_at ?? new Date().toISOString()
-      : parsed.data.status === "Open"
-        ? null
-        : existing.completed_at;
+    const parsed = taskUpdateInput.safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
 
-  const updateParams: Record<string, unknown> = {
-    title: merged.title,
-    assignee: merged.assignee,
-    status: merged.status,
-    completed_at,
-    id: req.params.taskId,
-  };
-  db.prepare(
-    `UPDATE tasks SET title = @title, assignee = @assignee, status = @status, completed_at = @completed_at
-     WHERE id = @id`
-  ).run(updateParams as any);
+    const existingData = existing.data() as { completed_at: string | null };
+    const update: Record<string, unknown> = { ...parsed.data };
+    if (parsed.data.status === "Done") {
+      update.completed_at = existingData.completed_at ?? new Date().toISOString();
+    } else if (parsed.data.status === "Open") {
+      update.completed_at = null;
+    }
 
-  const row = db.prepare("SELECT * FROM tasks WHERE id = ?").get(req.params.taskId);
-  res.json(row);
-});
+    await ref.update(update);
+    const updated = await ref.get();
+    res.json({ id: updated.id, lead_id: req.params.leadId, ...updated.data() });
+  })
+);
 
-tasksRouter.delete<{ leadId: string; taskId: string }>("/:taskId", (req, res) => {
-  const result = db
-    .prepare("DELETE FROM tasks WHERE id = ? AND lead_id = ?")
-    .run(req.params.taskId, req.params.leadId);
-  if (result.changes === 0) return res.status(404).json({ error: "Task not found" });
-  res.status(204).send();
-});
+tasksRouter.delete<{ leadId: string; taskId: string }>(
+  "/:taskId",
+  ah<{ leadId: string; taskId: string }>(async (req, res) => {
+    const ref = leadTasks(req.params.leadId).doc(req.params.taskId);
+    const doc = await ref.get();
+    if (!doc.exists) return res.status(404).json({ error: "Task not found" });
+    await ref.delete();
+    res.status(204).send();
+  })
+);

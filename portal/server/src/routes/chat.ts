@@ -2,7 +2,8 @@ import { Router } from "express";
 import { nanoid } from "nanoid";
 import { z } from "zod";
 import { createAlerts, truncate } from "../alerts.js";
-import { db } from "../db.js";
+import { ah } from "../asyncHandler.js";
+import { db } from "../firebaseAdmin.js";
 
 export const chatRouter = Router({ mergeParams: true });
 
@@ -12,34 +13,40 @@ const messageInput = z.object({
   notify: z.array(z.string()).optional(),
 });
 
-chatRouter.get<{ leadId: string }>("/", (req, res) => {
-  const rows = db
-    .prepare("SELECT * FROM chat_messages WHERE lead_id = ? ORDER BY created_at ASC")
-    .all(req.params.leadId);
-  res.json(rows);
-});
+function leadChat(leadId: string) {
+  return db.collection("leads").doc(leadId).collection("chatMessages");
+}
 
-chatRouter.post<{ leadId: string }>("/", (req, res) => {
-  const parsed = messageInput.safeParse(req.body);
-  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+chatRouter.get<{ leadId: string }>(
+  "/",
+  ah<{ leadId: string }>(async (req, res) => {
+    const snap = await leadChat(req.params.leadId).orderBy("created_at", "asc").get();
+    res.json(snap.docs.map((d) => ({ id: d.id, lead_id: req.params.leadId, ...d.data() })));
+  })
+);
 
-  const id = nanoid();
-  const created_at = new Date().toISOString();
-  db.prepare(
-    `INSERT INTO chat_messages (id, lead_id, author, body, created_at) VALUES (?, ?, ?, ?, ?)`
-  ).run(id, req.params.leadId, parsed.data.author, parsed.data.body, created_at);
+chatRouter.post<{ leadId: string }>(
+  "/",
+  ah<{ leadId: string }>(async (req, res) => {
+    const parsed = messageInput.safeParse(req.body);
+    if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
 
-  if (parsed.data.notify?.length) {
-    createAlerts({
-      leadId: req.params.leadId,
-      sourceType: "chat",
-      sourceId: id,
-      message: `${parsed.data.author} replied: "${truncate(parsed.data.body)}"`,
-      createdBy: parsed.data.author,
-      recipients: parsed.data.notify,
-    });
-  }
+    const id = nanoid();
+    const created_at = new Date().toISOString();
+    const message = { author: parsed.data.author, body: parsed.data.body, created_at };
+    await leadChat(req.params.leadId).doc(id).set(message);
 
-  const row = db.prepare("SELECT * FROM chat_messages WHERE id = ?").get(id);
-  res.status(201).json(row);
-});
+    if (parsed.data.notify?.length) {
+      await createAlerts({
+        leadId: req.params.leadId,
+        sourceType: "chat",
+        sourceId: id,
+        message: `${parsed.data.author} replied: "${truncate(parsed.data.body)}"`,
+        createdBy: parsed.data.author,
+        recipients: parsed.data.notify,
+      });
+    }
+
+    res.status(201).json({ id, lead_id: req.params.leadId, ...message });
+  })
+);

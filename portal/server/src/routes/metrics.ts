@@ -1,11 +1,13 @@
 import { Router } from "express";
-import { db } from "../db.js";
+import { ah } from "../asyncHandler.js";
+import { db } from "../firebaseAdmin.js";
 import { ACTIVE_STAGES, type Lead } from "../types.js";
 
 export const metricsRouter = Router();
 
-metricsRouter.get("/", (_req, res) => {
-  const leads = db.prepare("SELECT * FROM leads").all() as unknown as Lead[];
+metricsRouter.get("/", ah(async (_req, res) => {
+  const snap = await db.collection("leads").get();
+  const leads = snap.docs.map((d) => ({ id: d.id, ...d.data() })) as unknown as Lead[];
 
   const active = leads.filter((l) => (ACTIVE_STAGES as readonly string[]).includes(l.stage));
   const financed = leads.filter((l) => l.stage === "Financed");
@@ -49,4 +51,4 @@ metricsRouter.get("/", (_req, res) => {
     byStage,
     byAssetClass,
   });
-});
+}));

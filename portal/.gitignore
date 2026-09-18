@@ -6,4 +6,5 @@ build/
 .env
 .env.local
 server/data/
+server/scripts/service-account-key.json
 .DS_Store

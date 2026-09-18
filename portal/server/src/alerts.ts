@@ -1,7 +1,7 @@
 import { nanoid } from "nanoid";
-import { db } from "./db.js";
+import { db } from "./firebaseAdmin.js";
 
-export function createAlerts(params: {
+export async function createAlerts(params: {
   leadId: string;
   sourceType: "comment" | "chat" | "task" | "document";
   sourceId: string | null;
@@ -13,14 +13,26 @@ export function createAlerts(params: {
   const uniqueRecipients = Array.from(new Set(recipients)).filter((r) => r && r !== createdBy);
   if (uniqueRecipients.length === 0) return;
 
+  const leadDoc = await db.collection("leads").doc(leadId).get();
+  const borrowerName = (leadDoc.data()?.borrower_name as string) ?? "Unknown deal";
+
   const created_at = new Date().toISOString();
-  const insert = db.prepare(
-    `INSERT INTO alerts (id, lead_id, recipient, source_type, source_id, message, created_by, created_at, read_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL)`
-  );
+  const batch = db.batch();
   for (const recipient of uniqueRecipients) {
-    insert.run(nanoid(), leadId, recipient, sourceType, sourceId, message, createdBy, created_at);
+    const ref = db.collection("alerts").doc(nanoid());
+    batch.set(ref, {
+      leadId,
+      borrower_name: borrowerName,
+      recipient,
+      source_type: sourceType,
+      source_id: sourceId,
+      message,
+      created_by: createdBy,
+      created_at,
+      read_at: null,
+    });
   }
+  await batch.commit();
 }
 
 export function truncate(text: string, max = 80): string {

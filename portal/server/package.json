@@ -13,6 +13,7 @@
     "@anthropic-ai/sdk": "^0.126.0",
     "cors": "^2.8.5",
     "express": "^4.21.1",
+    "firebase-admin": "^14.4.0",
     "multer": "^2.4.0",
     "nanoid": "^5.0.9",
     "pdf-parse": "^2.4.5",

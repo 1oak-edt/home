@@ -1,8 +1,10 @@
 import { Router } from "express";
 import { nanoid } from "nanoid";
 import { z } from "zod";
-import { db } from "../db.js";
-import { ALL_STAGES, ASSET_CLASSES, LOAN_TYPES, type Lead, type Stage } from "../types.js";
+import { ah } from "../asyncHandler.js";
+import { db } from "../firebaseAdmin.js";
+import { deleteLeadCascade } from "../firestoreHelpers.js";
+import { ALL_STAGES, ASSET_CLASSES, LOAN_TYPES, type Lead } from "../types.js";
 
 export const leadsRouter = Router();
 
@@ -41,34 +43,38 @@ function now() {
   return new Date().toISOString();
 }
 
-function rowToLead(row: any): Lead {
+function docToLead(id: string, data: any): Lead {
   return {
-    ...row,
-    sponsor_names: row.sponsor_names ? JSON.parse(row.sponsor_names) : [],
-    use_of_proceeds: row.use_of_proceeds ? JSON.parse(row.use_of_proceeds) : [],
-    exec_summary_highlights: row.exec_summary_highlights ? JSON.parse(row.exec_summary_highlights) : [],
+    id,
+    sponsor_names: [],
+    use_of_proceeds: [],
+    exec_summary_highlights: [],
+    ...data,
   } as Lead;
 }
 
-leadsRouter.get("/", (_req, res) => {
-  const rows = db.prepare("SELECT * FROM leads ORDER BY updated_at DESC").all();
-  res.json(rows.map(rowToLead));
-});
+leadsRouter.get("/", ah(async (_req, res) => {
+  const snap = await db.collection("leads").orderBy("updated_at", "desc").get();
+  res.json(snap.docs.map((d) => docToLead(d.id, d.data())));
+}));
 
-leadsRouter.get("/:id", (req, res) => {
-  const row = db.prepare("SELECT * FROM leads WHERE id = ?").get(req.params.id);
-  if (!row) return res.status(404).json({ error: "Lead not found" });
-  res.json(rowToLead(row));
-});
+leadsRouter.get("/:id", ah(async (req, res) => {
+  const doc = await db.collection("leads").doc(req.params.id).get();
+  if (!doc.exists) return res.status(404).json({ error: "Lead not found" });
+  res.json(docToLead(doc.id, doc.data()));
+}));
 
-leadsRouter.get("/:id/history", (req, res) => {
-  const rows = db
-    .prepare("SELECT * FROM stage_history WHERE lead_id = ? ORDER BY created_at ASC")
-    .all(req.params.id);
-  res.json(rows);
-});
+leadsRouter.get("/:id/history", ah(async (req, res) => {
+  const snap = await db
+    .collection("leads")
+    .doc(req.params.id)
+    .collection("stageHistory")
+    .orderBy("created_at", "asc")
+    .get();
+  res.json(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+}));
 
-leadsRouter.post("/", (req, res) => {
+leadsRouter.post("/", ah(async (req, res) => {
   const parsed = leadInput.safeParse(req.body);
   if (!parsed.success) {
     return res.status(400).json({ error: parsed.error.flatten() });
@@ -76,24 +82,8 @@ leadsRouter.post("/", (req, res) => {
   const id = nanoid();
   const ts = now();
   const data = parsed.data;
-  db.prepare(
-    `INSERT INTO leads (
-      id, borrower_name, contact_name, contact_email, contact_phone,
-      property_address, city, state, asset_class, loan_type, loan_amount,
-      purchase_price, equity_contribution, interest_rate, term_months,
-      exit_strategy, sponsor_names, use_of_proceeds, latitude, longitude,
-      stage, prior_stage, lost_reason, source, assigned_to, expected_close_date,
-      notes, created_at, updated_at, stage_changed_at
-    ) VALUES (
-      @id, @borrower_name, @contact_name, @contact_email, @contact_phone,
-      @property_address, @city, @state, @asset_class, @loan_type, @loan_amount,
-      @purchase_price, @equity_contribution, @interest_rate, @term_months,
-      @exit_strategy, @sponsor_names, @use_of_proceeds, @latitude, @longitude,
-      'Intake', NULL, NULL, @source, @assigned_to, @expected_close_date,
-      @notes, @created_at, @updated_at, @stage_changed_at
-    )`
-  ).run({
-    id,
+
+  const lead = {
     borrower_name: data.borrower_name,
     contact_name: data.contact_name ?? null,
     contact_email: data.contact_email ?? null,
@@ -109,10 +99,16 @@ leadsRouter.post("/", (req, res) => {
     interest_rate: data.interest_rate ?? null,
     term_months: data.term_months ?? null,
     exit_strategy: data.exit_strategy ?? null,
-    sponsor_names: JSON.stringify(data.sponsor_names ?? []),
-    use_of_proceeds: JSON.stringify(data.use_of_proceeds ?? []),
+    sponsor_names: data.sponsor_names ?? [],
+    use_of_proceeds: data.use_of_proceeds ?? [],
     latitude: data.latitude ?? null,
     longitude: data.longitude ?? null,
+    exec_summary_filename: null,
+    exec_summary_highlights: [],
+    exec_summary_uploaded_at: null,
+    stage: "Intake",
+    prior_stage: null,
+    lost_reason: null,
     source: data.source ?? null,
     assigned_to: data.assigned_to ?? null,
     expected_close_date: data.expected_close_date ?? null,
@@ -120,111 +116,46 @@ leadsRouter.post("/", (req, res) => {
     created_at: ts,
     updated_at: ts,
     stage_changed_at: ts,
+  };
+
+  await db.collection("leads").doc(id).set(lead);
+  await db.collection("leads").doc(id).collection("stageHistory").doc(nanoid()).set({
+    from_stage: null,
+    to_stage: "Intake",
+    reason: null,
+    created_at: ts,
   });
 
-  db.prepare(
-    `INSERT INTO stage_history (id, lead_id, from_stage, to_stage, reason, created_at)
-     VALUES (?, ?, NULL, 'Intake', NULL, ?)`
-  ).run(nanoid(), id, ts);
+  res.status(201).json(docToLead(id, lead));
+}));
 
-  const row = db.prepare("SELECT * FROM leads WHERE id = ?").get(id);
-  res.status(201).json(rowToLead(row));
-});
-
-leadsRouter.patch("/:id", (req, res) => {
-  const existing = db.prepare("SELECT * FROM leads WHERE id = ?").get(req.params.id) as
-    | Record<string, any>
-    | undefined;
-  if (!existing) return res.status(404).json({ error: "Lead not found" });
+leadsRouter.patch("/:id", ah(async (req, res) => {
+  const ref = db.collection("leads").doc(req.params.id);
+  const existing = await ref.get();
+  if (!existing.exists) return res.status(404).json({ error: "Lead not found" });
 
   const partial = leadInput.partial().safeParse(req.body);
   if (!partial.success) {
     return res.status(400).json({ error: partial.error.flatten() });
   }
-  const data = partial.data;
-  const ts = now();
 
-  const merged = {
-    ...existing,
-    ...data,
-    sponsor_names: JSON.stringify(
-      data.sponsor_names ?? (existing.sponsor_names ? JSON.parse(existing.sponsor_names) : [])
-    ),
-    use_of_proceeds: JSON.stringify(
-      data.use_of_proceeds ?? (existing.use_of_proceeds ? JSON.parse(existing.use_of_proceeds) : [])
-    ),
-    updated_at: ts,
-  };
-  const updateParams: Record<string, unknown> = {
-    id: req.params.id,
-    borrower_name: merged.borrower_name,
-    contact_name: merged.contact_name,
-    contact_email: merged.contact_email,
-    contact_phone: merged.contact_phone,
-    property_address: merged.property_address,
-    city: merged.city,
-    state: merged.state,
-    asset_class: merged.asset_class,
-    loan_type: merged.loan_type,
-    loan_amount: merged.loan_amount,
-    purchase_price: merged.purchase_price,
-    equity_contribution: merged.equity_contribution,
-    interest_rate: merged.interest_rate,
-    term_months: merged.term_months,
-    exit_strategy: merged.exit_strategy,
-    sponsor_names: merged.sponsor_names,
-    use_of_proceeds: merged.use_of_proceeds,
-    latitude: merged.latitude,
-    longitude: merged.longitude,
-    source: merged.source,
-    assigned_to: merged.assigned_to,
-    expected_close_date: merged.expected_close_date,
-    notes: merged.notes,
-    updated_at: merged.updated_at,
-  };
-  db.prepare(
-    `UPDATE leads SET
-      borrower_name = @borrower_name,
-      contact_name = @contact_name,
-      contact_email = @contact_email,
-      contact_phone = @contact_phone,
-      property_address = @property_address,
-      city = @city,
-      state = @state,
-      asset_class = @asset_class,
-      loan_type = @loan_type,
-      loan_amount = @loan_amount,
-      purchase_price = @purchase_price,
-      equity_contribution = @equity_contribution,
-      interest_rate = @interest_rate,
-      term_months = @term_months,
-      exit_strategy = @exit_strategy,
-      sponsor_names = @sponsor_names,
-      use_of_proceeds = @use_of_proceeds,
-      latitude = @latitude,
-      longitude = @longitude,
-      source = @source,
-      assigned_to = @assigned_to,
-      expected_close_date = @expected_close_date,
-      notes = @notes,
-      updated_at = @updated_at
-    WHERE id = @id`
-  ).run(updateParams as any);
+  const update = { ...partial.data, updated_at: now() };
+  await ref.update(update);
 
-  const row = db.prepare("SELECT * FROM leads WHERE id = ?").get(req.params.id);
-  res.json(rowToLead(row));
-});
+  const updated = await ref.get();
+  res.json(docToLead(updated.id, updated.data()));
+}));
 
 const stageChangeSchema = z.object({
   stage: z.enum(ALL_STAGES),
   reason: z.string().optional().nullable(),
 });
 
-leadsRouter.post("/:id/stage", (req, res) => {
-  const existing = db.prepare("SELECT * FROM leads WHERE id = ?").get(req.params.id) as
-    | Lead
-    | undefined;
-  if (!existing) return res.status(404).json({ error: "Lead not found" });
+leadsRouter.post("/:id/stage", ah(async (req, res) => {
+  const ref = db.collection("leads").doc(req.params.id);
+  const existing = await ref.get();
+  if (!existing.exists) return res.status(404).json({ error: "Lead not found" });
+  const existingData = existing.data() as Lead;
 
   const parsed = stageChangeSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
@@ -232,36 +163,31 @@ leadsRouter.post("/:id/stage", (req, res) => {
   const { stage, reason } = parsed.data;
   const ts = now();
   const isClosing = stage === "Disqualified" || stage === "Lost";
-  const wasClosed = existing.stage === "Disqualified" || existing.stage === "Lost";
+  const wasClosed = existingData.stage === "Disqualified" || existingData.stage === "Lost";
 
-  db.prepare(
-    `UPDATE leads SET
-      stage = @stage,
-      prior_stage = @prior_stage,
-      lost_reason = @lost_reason,
-      updated_at = @updated_at,
-      stage_changed_at = @stage_changed_at
-    WHERE id = @id`
-  ).run({
-    id: req.params.id,
+  await ref.update({
     stage,
-    prior_stage: isClosing ? existing.stage : wasClosed ? null : existing.prior_stage,
+    prior_stage: isClosing ? existingData.stage : wasClosed ? null : existingData.prior_stage ?? null,
     lost_reason: isClosing ? reason ?? null : null,
     updated_at: ts,
     stage_changed_at: ts,
   });
 
-  db.prepare(
-    `INSERT INTO stage_history (id, lead_id, from_stage, to_stage, reason, created_at)
-     VALUES (?, ?, ?, ?, ?, ?)`
-  ).run(nanoid(), req.params.id, existing.stage, stage, reason ?? null, ts);
+  await ref.collection("stageHistory").doc(nanoid()).set({
+    from_stage: existingData.stage,
+    to_stage: stage,
+    reason: reason ?? null,
+    created_at: ts,
+  });
 
-  const row = db.prepare("SELECT * FROM leads WHERE id = ?").get(req.params.id);
-  res.json(rowToLead(row));
-});
+  const updated = await ref.get();
+  res.json(docToLead(updated.id, updated.data()));
+}));
 
-leadsRouter.delete("/:id", (req, res) => {
-  const result = db.prepare("DELETE FROM leads WHERE id = ?").run(req.params.id);
-  if (result.changes === 0) return res.status(404).json({ error: "Lead not found" });
+leadsRouter.delete("/:id", ah(async (req, res) => {
+  const ref = db.collection("leads").doc(req.params.id);
+  const existing = await ref.get();
+  if (!existing.exists) return res.status(404).json({ error: "Lead not found" });
+  await deleteLeadCascade(req.params.id);
   res.status(204).send();
-});
+}));
