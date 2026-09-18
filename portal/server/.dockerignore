@@ -1,0 +1,5 @@
+node_modules
+dist
+data
+scripts/service-account-key.json
+*.log

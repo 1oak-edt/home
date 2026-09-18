@@ -65,14 +65,12 @@ export function ExecSummaryPanel({ lead, onUpdated }: Props) {
 
       {lead.exec_summary_filename ? (
         <>
-          <a
-            href={api.execSummaryFileUrl(lead.id)}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-2 block truncate text-[13px] font-medium text-oak-sage underline-offset-2 hover:underline"
+          <button
+            onClick={() => api.openExecSummaryFile(lead.id)}
+            className="mt-2 block truncate text-left text-[13px] font-medium text-oak-sage underline-offset-2 hover:underline"
           >
             {lead.exec_summary_filename}
-          </a>
+          </button>
           {lead.exec_summary_uploaded_at && (
             <div className="text-[11px] text-oak-sagelight">
               Uploaded {formatDate(lead.exec_summary_uploaded_at)}

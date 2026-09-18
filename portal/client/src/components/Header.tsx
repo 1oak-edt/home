@@ -1,4 +1,4 @@
-import { APP_USERS } from "../types";
+import { useAuth } from "../hooks/useAuth";
 import { AlertsBell } from "./AlertsBell";
 
 export type ViewKey = "pipeline" | "lost";
@@ -9,7 +9,6 @@ interface Props {
   lostCount: number;
   onNewLead: () => void;
   currentUser: string;
-  onCurrentUserChange: (u: string) => void;
   onOpenDealFromAlert: (leadId: string) => void;
 }
 
@@ -19,9 +18,10 @@ export function Header({
   lostCount,
   onNewLead,
   currentUser,
-  onCurrentUserChange,
   onOpenDealFromAlert,
 }: Props) {
+  const { signOut } = useAuth();
+
   function tabClass(active: boolean) {
     return `flex items-center gap-2 rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${
       active ? "bg-oak-dark text-oak-cream shadow-card" : "text-oak-sage hover:text-oak-ink"
@@ -65,20 +65,15 @@ export function Header({
 
         <div className="ml-auto flex items-center gap-3">
           <AlertsBell currentUser={currentUser} onOpenDeal={onOpenDealFromAlert} />
-          <label className="flex items-center gap-1.5 text-[12px] text-oak-sage">
-            <span className="hidden sm:inline">Acting as</span>
-            <select
-              value={currentUser}
-              onChange={(e) => onCurrentUserChange(e.target.value)}
-              className="rounded-md border border-oak-line bg-white px-2 py-1.5 text-[13px] font-medium text-oak-ink focus:border-oak-sage focus:outline-none"
+          <div className="flex items-center gap-1.5 text-[13px] font-medium text-oak-ink">
+            {currentUser}
+            <button
+              onClick={() => signOut()}
+              className="text-[12px] font-medium text-oak-sage hover:text-oak-ink hover:underline"
             >
-              {APP_USERS.map((u) => (
-                <option key={u} value={u}>
-                  {u}
-                </option>
-              ))}
-            </select>
-          </label>
+              Sign out
+            </button>
+          </div>
           <button
             onClick={onNewLead}
             className="rounded-md bg-oak-gold px-4 py-2 text-sm font-semibold text-oak-darker shadow-card transition-transform hover:brightness-95 active:scale-[0.98]"

@@ -1,23 +1,38 @@
 import { useEffect, useMemo, useState } from "react";
 import { api } from "./api";
+import { nameForUser } from "./authUsers";
 import { DealMap } from "./components/DealMap";
 import { DealRecordPage } from "./components/DealRecordPage";
 import { Filters, type FilterState } from "./components/Filters";
 import { FunnelChart } from "./components/FunnelChart";
 import { Header, type ViewKey } from "./components/Header";
+import { LoginScreen } from "./components/LoginScreen";
 import { LostDeals } from "./components/LostDeals";
 import { MetricsBar } from "./components/MetricsBar";
 import { NewLeadModal } from "./components/NewLeadModal";
 import { PipelineBoard } from "./components/PipelineBoard";
 import { ReasonDialog } from "./components/ReasonDialog";
-import { useCurrentUser } from "./hooks/useCurrentUser";
+import { useAuth } from "./hooks/useAuth";
 import type { Lead, Metrics, NewLeadInput, Stage } from "./types";
 
 const EMPTY_FILTERS: FilterState = { search: "", assetClass: "", loanType: "", assignedTo: "" };
 
 export default function App() {
+  const { user, loading: authLoading } = useAuth();
+
+  if (authLoading) {
+    return <div className="flex min-h-screen items-center justify-center bg-oak-cream" />;
+  }
+
+  if (!user) {
+    return <LoginScreen />;
+  }
+
+  return <Dashboard currentUser={nameForUser(user)} />;
+}
+
+function Dashboard({ currentUser }: { currentUser: string }) {
   const [view, setView] = useState<ViewKey>("pipeline");
-  const [currentUser, setCurrentUser] = useCurrentUser();
   const [mapExpanded, setMapExpanded] = useState(true);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [metrics, setMetrics] = useState<Metrics | null>(null);
@@ -134,7 +149,6 @@ export default function App() {
         lostCount={closedLeads.length}
         onNewLead={() => setShowNewLead(true)}
         currentUser={currentUser}
-        onCurrentUserChange={setCurrentUser}
         onOpenDealFromAlert={handleOpenDealFromAlert}
       />
 

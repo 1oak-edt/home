@@ -84,13 +84,13 @@ function CategoryBin({
                 key={d.id}
                 className="flex items-center justify-between gap-2 rounded px-1.5 py-1 hover:bg-black/[0.03]"
               >
-                <a
-                  href={api.documentDownloadUrl(leadId, d.id)}
-                  className="min-w-0 flex-1 truncate text-[12px] font-medium text-oak-sage hover:underline"
+                <button
+                  onClick={() => api.downloadDocument(leadId, d.id, d.original_name)}
+                  className="min-w-0 flex-1 truncate text-left text-[12px] font-medium text-oak-sage hover:underline"
                   title={d.original_name}
                 >
                   {d.original_name}
-                </a>
+                </button>
                 <span className="shrink-0 text-[11px] text-oak-sagelight">{formatSize(d.size)}</span>
                 <button
                   onClick={() => onDelete(d.id)}
