@@ -1,5 +1,22 @@
-import type { Alert, ChatMessage, Comment, Lead, LeadDocument, Metrics, NewLeadInput, Stage, Task } from "./types";
+import type {
+  Alert,
+  ChatMessage,
+  ChecklistItemState,
+  ChecklistPatch,
+  Comment,
+  Lead,
+  LeadDocument,
+  MapShape,
+  Metrics,
+  NewLeadInput,
+  Partner,
+  PartnerFields,
+  Stage,
+  Task,
+} from "./types";
 import { auth } from "./firebase";
+import { saveBlob } from "./utils/download";
+import type { Underwriting } from "./utils/underwriting";
 
 const BASE = "/api";
 
@@ -17,6 +34,12 @@ async function authFetch(url: string, init: RequestInit = {}): Promise<Response>
   const headers = new Headers(init.headers);
   if (token) headers.set("Authorization", `Bearer ${token}`);
   return fetch(url, { ...init, headers });
+}
+
+async function fetchDocumentBlob(leadId: string, docId: string): Promise<Blob> {
+  const res = await authFetch(`${BASE}/leads/${leadId}/documents/${docId}/download`);
+  if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+  return res.blob();
 }
 
 function json(body: unknown): RequestInit {
@@ -94,17 +117,10 @@ export const api = {
   deleteDocument: (leadId: string, docId: string) =>
     authFetch(`${BASE}/leads/${leadId}/documents/${docId}`, { method: "DELETE" }).then((r) => handle<void>(r)),
 
-  downloadDocument: async (leadId: string, docId: string, filename: string) => {
-    const res = await authFetch(`${BASE}/leads/${leadId}/documents/${docId}/download`);
-    if (!res.ok) throw new Error(`Request failed: ${res.status}`);
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(url);
-  },
+  fetchDocumentBlob,
+
+  downloadDocument: async (leadId: string, docId: string, filename: string) =>
+    saveBlob(await fetchDocumentBlob(leadId, docId), filename),
 
   uploadExecSummary: (leadId: string, file: File) => {
     const form = new FormData();
@@ -122,6 +138,53 @@ export const api = {
     window.open(url, "_blank", "noreferrer");
     setTimeout(() => URL.revokeObjectURL(url), 60_000);
   },
+
+  getUnderwriting: (leadId: string) =>
+    authFetch(`${BASE}/leads/${leadId}/underwriting`).then((r) =>
+      handle<{ data: Partial<Underwriting> | null; updated_at: string | null; updated_by: string | null }>(r)
+    ),
+
+  saveUnderwriting: (leadId: string, data: Underwriting) =>
+    authFetch(`${BASE}/leads/${leadId}/underwriting`, { method: "PUT", ...json(data) }).then((r) =>
+      handle<{ updated_at: string; updated_by: string | null }>(r)
+    ),
+
+  getMapShapes: (leadId: string) =>
+    authFetch(`${BASE}/leads/${leadId}/map-shapes`).then((r) =>
+      handle<{ shapes: MapShape[]; updated_at: string | null; updated_by: string | null }>(r)
+    ),
+
+  saveMapShapes: (leadId: string, shapes: MapShape[]) =>
+    authFetch(`${BASE}/leads/${leadId}/map-shapes`, { method: "PUT", ...json({ shapes }) }).then((r) =>
+      handle<{ updated_at: string; updated_by: string | null }>(r)
+    ),
+
+  getEscrowChecklist: (leadId: string) =>
+    authFetch(`${BASE}/leads/${leadId}/escrow-checklist`).then((r) =>
+      handle<{ items: Record<string, ChecklistItemState>; updated_at: string | null; updated_by: string | null }>(r)
+    ),
+
+  updateEscrowChecklist: (leadId: string, updates: Record<string, ChecklistPatch>) =>
+    authFetch(`${BASE}/leads/${leadId}/escrow-checklist`, { method: "PATCH", ...json({ updates }) }).then((r) =>
+      handle<{ items: Record<string, ChecklistItemState> }>(r)
+    ),
+
+  getPartners: () => authFetch(`${BASE}/partners`).then((r) => handle<Partner[]>(r)),
+
+  createPartner: (input: Partial<PartnerFields> & { contact_name: string }) =>
+    authFetch(`${BASE}/partners`, { method: "POST", ...json(input) }).then((r) => handle<Partner>(r)),
+
+  updatePartner: (id: string, patch: Partial<PartnerFields>) =>
+    authFetch(`${BASE}/partners/${id}`, { method: "PATCH", ...json(patch) }).then((r) => handle<Partner>(r)),
+
+  deletePartner: (id: string) =>
+    authFetch(`${BASE}/partners/${id}`, { method: "DELETE" }).then((r) => handle<void>(r)),
+
+  linkPartnerDeal: (id: string, leadId: string) =>
+    authFetch(`${BASE}/partners/${id}/deals`, { method: "POST", ...json({ leadId }) }).then((r) => handle<Partner>(r)),
+
+  unlinkPartnerDeal: (id: string, leadId: string) =>
+    authFetch(`${BASE}/partners/${id}/deals/${leadId}`, { method: "DELETE" }).then((r) => handle<Partner>(r)),
 
   getAlerts: (user: string, unreadOnly?: boolean) =>
     authFetch(`${BASE}/alerts?user=${encodeURIComponent(user)}${unreadOnly ? "&unread=true" : ""}`).then((r) =>

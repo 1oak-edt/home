@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
 import type { Comment } from "../types";
-import { formatDate, initials } from "../utils/format";
+import { formatDateTime, initials } from "../utils/format";
 import { NotifySelect } from "./NotifySelect";
 
 interface Props {
@@ -47,9 +47,10 @@ export function CommentsPanel({ leadId, currentUser }: Props) {
             <div className="flex-1">
               <div className="flex items-baseline gap-2">
                 <span className="text-[13px] font-semibold text-oak-ink">{c.author}</span>
-                <span className="text-[11px] text-oak-sagelight">{formatDate(c.created_at)}</span>
+                {c.author === currentUser && <span className="text-[11px] text-oak-sagelight">(you)</span>}
+                <span className="text-[11px] text-oak-sagelight">{formatDateTime(c.created_at)}</span>
               </div>
-              <div className="text-[13px] text-oak-ink">{c.body}</div>
+              <div className="break-words text-[13px] text-oak-ink">{c.body}</div>
             </div>
           </div>
         ))}

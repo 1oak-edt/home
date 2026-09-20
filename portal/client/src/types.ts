@@ -70,6 +70,7 @@ export const DOCUMENT_CATEGORIES = [
   "Title Documents",
   "Environmental",
   "Mortgage Documents",
+  "Tax Documents",
   "Miscellaneous",
 ] as const;
 
@@ -210,3 +211,43 @@ export type NewLeadInput = {
   expected_close_date?: string | null;
   notes?: string | null;
 };
+
+export interface LatLngPoint {
+  lat: number;
+  lng: number;
+}
+
+export type MapShape =
+  | { id: string; kind: "polygon"; points: LatLngPoint[] }
+  | { id: string; kind: "polyline"; points: LatLngPoint[] }
+  | { id: string; kind: "circle"; center: LatLngPoint; radius: number };
+
+export interface ChecklistItemState {
+  received?: boolean;
+  na?: boolean;
+  docIds?: string[];
+  received_by?: string | null;
+  received_at?: string | null;
+}
+
+export type ChecklistPatch = { received?: boolean; na?: boolean; docIds?: string[] };
+
+export const PARTNER_TYPES = ["CRE", "CLO", "Other"] as const;
+
+export interface Partner {
+  id: string;
+  contact_name: string;
+  preferred_name: string;
+  company: string;
+  type: string;
+  email: string;
+  phone: string;
+  market: string;
+  specialty: string;
+  notes: string;
+  deal_ids: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+export type PartnerFields = Omit<Partner, "id" | "deal_ids" | "created_at" | "updated_at">;

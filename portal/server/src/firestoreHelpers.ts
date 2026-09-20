@@ -1,3 +1,4 @@
+import { FieldValue } from "firebase-admin/firestore";
 import { db, bucket } from "./firebaseAdmin.js";
 
 export async function deleteSubcollection(leadId: string, subcollection: string) {
@@ -14,7 +15,17 @@ export async function deleteLeadCascade(leadId: string) {
     deleteSubcollection(leadId, "chatMessages"),
     deleteSubcollection(leadId, "tasks"),
     deleteSubcollection(leadId, "documents"),
+    deleteSubcollection(leadId, "underwriting"),
+    deleteSubcollection(leadId, "mapShapes"),
+    deleteSubcollection(leadId, "escrowChecklist"),
   ]);
+
+  const partnersSnap = await db.collection("partners").where("deal_ids", "array-contains", leadId).get();
+  if (!partnersSnap.empty) {
+    const partnerBatch = db.batch();
+    partnersSnap.docs.forEach((d) => partnerBatch.update(d.ref, { deal_ids: FieldValue.arrayRemove(leadId) }));
+    await partnerBatch.commit();
+  }
 
   const alertsSnap = await db.collection("alerts").where("leadId", "==", leadId).get();
   const alertBatch = db.batch();

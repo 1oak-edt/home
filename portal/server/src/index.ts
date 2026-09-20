@@ -6,10 +6,14 @@ import { alertsRouter } from "./routes/alerts.js";
 import { chatRouter } from "./routes/chat.js";
 import { commentsRouter } from "./routes/comments.js";
 import { documentsRouter } from "./routes/documents.js";
+import { escrowChecklistRouter } from "./routes/escrowChecklist.js";
 import { execSummaryRouter } from "./routes/execSummary.js";
 import { leadsRouter } from "./routes/leads.js";
+import { mapShapesRouter } from "./routes/mapShapes.js";
 import { metricsRouter } from "./routes/metrics.js";
+import { partnersRouter } from "./routes/partners.js";
 import { tasksRouter } from "./routes/tasks.js";
+import { underwritingRouter } from "./routes/underwriting.js";
 
 const app = express();
 const PORT = process.env.PORT ? Number(process.env.PORT) : 4000;
@@ -26,9 +30,13 @@ app.use("/api/leads/:leadId/chat", chatRouter);
 app.use("/api/leads/:leadId/tasks", tasksRouter);
 app.use("/api/leads/:leadId/documents", documentsRouter);
 app.use("/api/leads/:leadId/exec-summary", execSummaryRouter);
+app.use("/api/leads/:leadId/underwriting", underwritingRouter);
+app.use("/api/leads/:leadId/map-shapes", mapShapesRouter);
+app.use("/api/leads/:leadId/escrow-checklist", escrowChecklistRouter);
 app.use("/api/leads", leadsRouter);
 app.use("/api/metrics", metricsRouter);
 app.use("/api/alerts", alertsRouter);
+app.use("/api/partners", partnersRouter);
 
 // Final error handler: any error forwarded via next(err) (including from the
 // async route wrapper) lands here as a 500 instead of crashing the process.

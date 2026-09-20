@@ -10,6 +10,7 @@ import { LoginScreen } from "./components/LoginScreen";
 import { LostDeals } from "./components/LostDeals";
 import { MetricsBar } from "./components/MetricsBar";
 import { NewLeadModal } from "./components/NewLeadModal";
+import { PartnersPage } from "./components/PartnersPage";
 import { PipelineBoard } from "./components/PipelineBoard";
 import { ReasonDialog } from "./components/ReasonDialog";
 import { useAuth } from "./hooks/useAuth";
@@ -159,9 +160,11 @@ function Dashboard({ currentUser }: { currentUser: string }) {
           </div>
         )}
 
-        <div className="mb-5">
-          <MetricsBar metrics={metrics} />
-        </div>
+        {view !== "partners" && (
+          <div className="mb-5">
+            <MetricsBar metrics={metrics} />
+          </div>
+        )}
 
         {view === "pipeline" ? (
           <>
@@ -197,8 +200,10 @@ function Dashboard({ currentUser }: { currentUser: string }) {
               />
             )}
           </>
-        ) : (
+        ) : view === "lost" ? (
           <LostDeals leads={closedLeads} onOpen={setDetailLead} onReactivate={handleReactivate} />
+        ) : (
+          <PartnersPage leads={leads} onOpenDeal={setDetailLead} />
         )}
       </main>
 

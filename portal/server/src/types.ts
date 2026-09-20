@@ -79,6 +79,7 @@ export const DOCUMENT_CATEGORIES = [
   "Title Documents",
   "Environmental",
   "Mortgage Documents",
+  "Tax Documents",
   "Miscellaneous",
 ] as const;
 
@@ -154,3 +155,5 @@ export interface LeadDocument {
   uploaded_by: string | null;
   created_at: string;
 }
+
+export const PARTNER_TYPES = ["CRE", "CLO", "Other"] as const;

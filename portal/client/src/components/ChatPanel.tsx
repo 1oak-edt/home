@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { api } from "../api";
 import type { ChatMessage } from "../types";
-import { formatDate } from "../utils/format";
+import { formatDateTime, initials } from "../utils/format";
 import { NotifySelect } from "./NotifySelect";
 
 interface Props {
@@ -47,16 +47,27 @@ export function ChatPanel({ leadId, currentUser }: Props) {
         {messages.map((m) => {
           const mine = m.author === currentUser;
           return (
-            <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
+            <div key={m.id} className={`flex items-end gap-2 ${mine ? "flex-row-reverse" : ""}`}>
+              <div
+                title={m.author}
+                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[9px] font-semibold ${
+                  mine ? "bg-oak-gold text-oak-darker" : "bg-oak-dark text-oak-cream"
+                }`}
+              >
+                {initials(m.author)}
+              </div>
               <div
                 className={`max-w-[80%] rounded-lg px-3 py-2 ${
                   mine ? "bg-oak-dark text-oak-cream" : "bg-black/[0.04] text-oak-ink"
                 }`}
               >
-                {!mine && <div className="text-[11px] font-semibold text-oak-sage">{m.author}</div>}
-                <div className="text-[13px]">{m.body}</div>
+                <div className={`text-[11px] font-semibold ${mine ? "text-oak-gold" : "text-oak-sage"}`}>
+                  {m.author}
+                  {mine && <span className="ml-1 font-normal opacity-70">(you)</span>}
+                </div>
+                <div className="break-words text-[13px]">{m.body}</div>
                 <div className={`mt-0.5 text-[10px] ${mine ? "text-oak-cream/60" : "text-oak-sagelight"}`}>
-                  {formatDate(m.created_at)}
+                  {formatDateTime(m.created_at)}
                 </div>
               </div>
             </div>

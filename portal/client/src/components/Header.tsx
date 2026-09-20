@@ -1,7 +1,7 @@
 import { useAuth } from "../hooks/useAuth";
 import { AlertsBell } from "./AlertsBell";
 
-export type ViewKey = "pipeline" | "lost";
+export type ViewKey = "pipeline" | "lost" | "partners";
 
 interface Props {
   view: ViewKey;
@@ -60,6 +60,9 @@ export function Header({
                 {lostCount}
               </span>
             )}
+          </button>
+          <button onClick={() => onViewChange("partners")} className={tabClass(view === "partners")}>
+            Partners
           </button>
         </nav>
 
