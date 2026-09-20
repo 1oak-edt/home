@@ -18,6 +18,7 @@ export async function deleteLeadCascade(leadId: string) {
     deleteSubcollection(leadId, "underwriting"),
     deleteSubcollection(leadId, "mapShapes"),
     deleteSubcollection(leadId, "escrowChecklist"),
+    deleteSubcollection(leadId, "termSheet"),
   ]);
 
   const partnersSnap = await db.collection("partners").where("deal_ids", "array-contains", leadId).get();

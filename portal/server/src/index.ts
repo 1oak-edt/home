@@ -13,6 +13,7 @@ import { mapShapesRouter } from "./routes/mapShapes.js";
 import { metricsRouter } from "./routes/metrics.js";
 import { partnersRouter } from "./routes/partners.js";
 import { tasksRouter } from "./routes/tasks.js";
+import { termSheetRouter } from "./routes/termSheet.js";
 import { underwritingRouter } from "./routes/underwriting.js";
 
 const app = express();
@@ -33,6 +34,7 @@ app.use("/api/leads/:leadId/exec-summary", execSummaryRouter);
 app.use("/api/leads/:leadId/underwriting", underwritingRouter);
 app.use("/api/leads/:leadId/map-shapes", mapShapesRouter);
 app.use("/api/leads/:leadId/escrow-checklist", escrowChecklistRouter);
+app.use("/api/leads/:leadId/term-sheet", termSheetRouter);
 app.use("/api/leads", leadsRouter);
 app.use("/api/metrics", metricsRouter);
 app.use("/api/alerts", alertsRouter);

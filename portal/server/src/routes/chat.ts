@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { nanoid } from "nanoid";
 import { z } from "zod";
-import { createAlerts, truncate } from "../alerts.js";
+import { createAlerts, deleteAlertsForSource, truncate } from "../alerts.js";
 import { ah } from "../asyncHandler.js";
 import { db } from "../firebaseAdmin.js";
 
@@ -48,5 +48,16 @@ chatRouter.post<{ leadId: string }>(
     }
 
     res.status(201).json({ id, lead_id: req.params.leadId, ...message });
+  })
+);
+
+chatRouter.delete<{ leadId: string; messageId: string }>(
+  "/:messageId",
+  ah<{ leadId: string; messageId: string }>(async (req, res) => {
+    const ref = leadChat(req.params.leadId).doc(req.params.messageId);
+    if (!(await ref.get()).exists) return res.status(404).json({ error: "Message not found" });
+    await ref.delete();
+    await deleteAlertsForSource(req.params.leadId, "chat", req.params.messageId);
+    res.status(204).send();
   })
 );

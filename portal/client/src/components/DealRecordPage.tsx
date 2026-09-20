@@ -8,6 +8,7 @@ import { CommentsPanel } from "./CommentsPanel";
 import { DataRoomTab } from "./DataRoomTab";
 import { DealOverviewForm } from "./DealOverviewForm";
 import { EscrowChecklistTab } from "./EscrowChecklistTab";
+import { TermSheetTab } from "./TermSheetTab";
 import { ExecSummaryPanel } from "./ExecSummaryPanel";
 import { TasksPanel } from "./TasksPanel";
 import { UnderwritingTab } from "./underwriting/UnderwritingTab";
@@ -16,6 +17,7 @@ const TAB_LABELS = {
   overview: "Overview",
   dataroom: "Data Room",
   underwriting: "Valuation & Underwriting",
+  termsheet: "Term Sheet",
   checklist: "Escrow Checklist",
 } as const;
 
@@ -48,7 +50,7 @@ export function DealRecordPage({
   onReactivate,
   onLeadUpdated,
 }: Props) {
-  const [tab, setTab] = useState<"overview" | "dataroom" | "underwriting" | "checklist">("overview");
+  const [tab, setTab] = useState<"overview" | "dataroom" | "underwriting" | "termsheet" | "checklist">("overview");
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const isClosed = lead.stage === "Disqualified" || lead.stage === "Lost";
 
@@ -164,7 +166,7 @@ export function DealRecordPage({
 
       <div className="border-b border-oak-line bg-white px-6">
         <div className="flex gap-1">
-          {(["overview", "dataroom", "underwriting", "checklist"] as const).map((t) => (
+          {(["overview", "dataroom", "underwriting", "termsheet", "checklist"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -226,6 +228,8 @@ export function DealRecordPage({
           </div>
         ) : tab === "underwriting" ? (
           <UnderwritingTab key={lead.id} lead={lead} currentUser={currentUser} />
+        ) : tab === "termsheet" ? (
+          <TermSheetTab key={lead.id} lead={lead} />
         ) : (
           <EscrowChecklistTab key={lead.id} leadId={lead.id} currentUser={currentUser} />
         )}

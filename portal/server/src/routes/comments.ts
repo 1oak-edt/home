@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { nanoid } from "nanoid";
 import { z } from "zod";
-import { createAlerts, truncate } from "../alerts.js";
+import { createAlerts, deleteAlertsForSource, truncate } from "../alerts.js";
 import { ah } from "../asyncHandler.js";
 import { db } from "../firebaseAdmin.js";
 
@@ -58,6 +58,7 @@ commentsRouter.delete<{ leadId: string; commentId: string }>(
     const doc = await ref.get();
     if (!doc.exists) return res.status(404).json({ error: "Comment not found" });
     await ref.delete();
+    await deleteAlertsForSource(req.params.leadId, "comment", req.params.commentId);
     res.status(204).send();
   })
 );

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../api";
 import type { Comment } from "../types";
 import { formatDateTime, initials } from "../utils/format";
+import { DeleteControl } from "./DeleteControl";
 import { NotifySelect } from "./NotifySelect";
 
 interface Props {
@@ -14,6 +15,7 @@ export function CommentsPanel({ leadId, currentUser }: Props) {
   const [draft, setDraft] = useState("");
   const [notify, setNotify] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     api
@@ -21,6 +23,17 @@ export function CommentsPanel({ leadId, currentUser }: Props) {
       .then(setComments)
       .finally(() => setLoading(false));
   }, [leadId]);
+
+  async function remove(id: string) {
+    setDeleteError(null);
+    try {
+      await api.deleteComment(leadId, id);
+      setComments((prev) => prev.filter((c) => c.id !== id));
+    } catch (e) {
+      setDeleteError(e instanceof Error ? e.message : "Couldn't delete that comment.");
+      throw e;
+    }
+  }
 
   async function submit() {
     const body = draft.trim();
@@ -49,12 +62,16 @@ export function CommentsPanel({ leadId, currentUser }: Props) {
                 <span className="text-[13px] font-semibold text-oak-ink">{c.author}</span>
                 {c.author === currentUser && <span className="text-[11px] text-oak-sagelight">(you)</span>}
                 <span className="text-[11px] text-oak-sagelight">{formatDateTime(c.created_at)}</span>
+                <span className="ml-auto">
+                  <DeleteControl onDelete={() => remove(c.id)} />
+                </span>
               </div>
               <div className="break-words text-[13px] text-oak-ink">{c.body}</div>
             </div>
           </div>
         ))}
       </div>
+      {deleteError && <div className="mt-2 text-[12px] text-red-700">{deleteError}</div>}
 
       <div className="mt-3 flex gap-2">
         <input

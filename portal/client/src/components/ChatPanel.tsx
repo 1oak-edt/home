@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { api } from "../api";
 import type { ChatMessage } from "../types";
 import { formatDateTime, initials } from "../utils/format";
+import { DeleteControl } from "./DeleteControl";
 import { NotifySelect } from "./NotifySelect";
 
 interface Props {
@@ -13,6 +14,7 @@ export function ChatPanel({ leadId, currentUser }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState("");
   const [notify, setNotify] = useState<string[]>([]);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -22,6 +24,17 @@ export function ChatPanel({ leadId, currentUser }: Props) {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ block: "end" });
   }, [messages.length]);
+
+  async function remove(id: string) {
+    setDeleteError(null);
+    try {
+      await api.deleteChat(leadId, id);
+      setMessages((prev) => prev.filter((m) => m.id !== id));
+    } catch (e) {
+      setDeleteError(e instanceof Error ? e.message : "Couldn't delete that message.");
+      throw e;
+    }
+  }
 
   async function submit() {
     const body = draft.trim();
@@ -66,8 +79,9 @@ export function ChatPanel({ leadId, currentUser }: Props) {
                   {mine && <span className="ml-1 font-normal opacity-70">(you)</span>}
                 </div>
                 <div className="break-words text-[13px]">{m.body}</div>
-                <div className={`mt-0.5 text-[10px] ${mine ? "text-oak-cream/60" : "text-oak-sagelight"}`}>
-                  {formatDateTime(m.created_at)}
+                <div className={`mt-0.5 flex items-center gap-2 text-[10px] ${mine ? "text-oak-cream/60" : "text-oak-sagelight"}`}>
+                  <span>{formatDateTime(m.created_at)}</span>
+                  <DeleteControl tone={mine ? "dark" : "light"} onDelete={() => remove(m.id)} />
                 </div>
               </div>
             </div>
@@ -75,6 +89,7 @@ export function ChatPanel({ leadId, currentUser }: Props) {
         })}
         <div ref={bottomRef} />
       </div>
+      {deleteError && <div className="mt-2 text-[12px] text-red-700">{deleteError}</div>}
 
       <div className="mt-3 flex gap-2">
         <input

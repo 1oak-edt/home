@@ -16,6 +16,7 @@ import type {
 } from "./types";
 import { auth } from "./firebase";
 import { saveBlob } from "./utils/download";
+import type { TermSheetData } from "./utils/termSheet";
 import type { Underwriting } from "./utils/underwriting";
 
 const BASE = "/api";
@@ -77,12 +78,18 @@ export const api = {
       handle<Comment>(r)
     ),
 
+  deleteComment: (leadId: string, commentId: string) =>
+    authFetch(`${BASE}/leads/${leadId}/comments/${commentId}`, { method: "DELETE" }).then((r) => handle<void>(r)),
+
   getChat: (leadId: string) => authFetch(`${BASE}/leads/${leadId}/chat`).then((r) => handle<ChatMessage[]>(r)),
 
   sendChat: (leadId: string, author: string, body: string, notify?: string[]) =>
     authFetch(`${BASE}/leads/${leadId}/chat`, { method: "POST", ...json({ author, body, notify }) }).then((r) =>
       handle<ChatMessage>(r)
     ),
+
+  deleteChat: (leadId: string, messageId: string) =>
+    authFetch(`${BASE}/leads/${leadId}/chat/${messageId}`, { method: "DELETE" }).then((r) => handle<void>(r)),
 
   getTasks: (leadId: string) => authFetch(`${BASE}/leads/${leadId}/tasks`).then((r) => handle<Task[]>(r)),
 
@@ -156,6 +163,16 @@ export const api = {
 
   saveMapShapes: (leadId: string, shapes: MapShape[]) =>
     authFetch(`${BASE}/leads/${leadId}/map-shapes`, { method: "PUT", ...json({ shapes }) }).then((r) =>
+      handle<{ updated_at: string; updated_by: string | null }>(r)
+    ),
+
+  getTermSheet: (leadId: string) =>
+    authFetch(`${BASE}/leads/${leadId}/term-sheet`).then((r) =>
+      handle<{ data: Partial<TermSheetData> | null; updated_at: string | null; updated_by: string | null }>(r)
+    ),
+
+  saveTermSheet: (leadId: string, data: TermSheetData) =>
+    authFetch(`${BASE}/leads/${leadId}/term-sheet`, { method: "PUT", ...json(data) }).then((r) =>
       handle<{ updated_at: string; updated_by: string | null }>(r)
     ),
 

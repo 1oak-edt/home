@@ -38,3 +38,13 @@ export async function createAlerts(params: {
 export function truncate(text: string, max = 80): string {
   return text.length > max ? `${text.slice(0, max - 1)}…` : text;
 }
+
+// Deleting a comment or chat message also removes the notifications that quote it, so the bell never shows deleted text.
+export async function deleteAlertsForSource(leadId: string, sourceType: "comment" | "chat", sourceId: string) {
+  const snap = await db.collection("alerts").where("source_id", "==", sourceId).get();
+  const matches = snap.docs.filter((d) => d.data().leadId === leadId && d.data().source_type === sourceType);
+  if (matches.length === 0) return;
+  const batch = db.batch();
+  matches.forEach((d) => batch.delete(d.ref));
+  await batch.commit();
+}
