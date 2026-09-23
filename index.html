@@ -1607,7 +1607,8 @@
         </div>
       </div>
 
-      <form class="form-wrap" action="https://api.web3forms.com/submit" method="POST">
+      <form id="deal-form" class="form-wrap" action="https://api.web3forms.com/submit" method="POST">
+        <input type="hidden" name="_form_type" value="website_deal">
         <input type="hidden" name="access_key" value="5a0b18a4-d1d0-490a-9e40-421b75354400">
         <input type="hidden" name="subject" value="New Deal Submission — 1Oak Lending">
         <input type="hidden" name="from_name" value="1Oak Lending Website">
@@ -1968,6 +1969,27 @@
   window.addEventListener('scroll', () => {
     nav.classList.toggle('scrolled', window.scrollY > 20);
   }, { passive: true });
+</script>
+
+<script>
+  // Mirrors this form's submission into the deal portal's Leads inbox, alongside the existing
+  // Web3Forms email. Fire-and-forget: never blocks or interferes with the normal submission.
+  (function () {
+    const form = document.getElementById('deal-form');
+    if (!form) return;
+    form.addEventListener('submit', function () {
+      try {
+        const payload = {};
+        new FormData(form).forEach((value, key) => { payload[key] = value; });
+        fetch('https://portal.1oaklending.com/api/leads/inbound/website', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          keepalive: true,
+        }).catch(() => {});
+      } catch (e) {}
+    });
+  })();
 </script>
 
 </body>
