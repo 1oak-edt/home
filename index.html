@@ -706,53 +706,112 @@
 
     .team-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 2px;
       background: var(--border);
     }
     .team-card {
       background: var(--cream);
-      padding: 36px 28px;
+      padding: 32px 28px 28px;
       transition: background 0.2s;
     }
     .team-card:hover { background: var(--white); }
+    .team-card.active { background: var(--white); }
 
     .tc-mono {
-      width: 48px;
-      height: 48px;
+      width: 44px;
+      height: 44px;
       background: var(--forest);
       display: flex;
       align-items: center;
       justify-content: center;
       font-family: 'Quattrocento', serif;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
       color: var(--tan);
-      margin-bottom: 20px;
+      margin-bottom: 18px;
       border-radius: 4px;
     }
     .tc-name {
       font-family: 'Quattrocento', serif;
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 700;
       color: var(--forest);
       margin-bottom: 4px;
     }
     .tc-title {
       font-family: 'Fragment Mono', monospace;
+      font-size: 9.5px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #a07830;
+      margin-bottom: 20px;
+    }
+    .tc-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-family: 'Fragment Mono', monospace;
+      font-size: 9.5px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      background: none;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      padding: 0 0 3px;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .tc-toggle:hover { color: var(--forest); border-color: var(--forest); }
+    .tc-toggle[aria-expanded="true"] { color: var(--forest); border-color: var(--forest); }
+    .tc-icon {
+      font-size: 13px;
+      line-height: 1;
+      display: inline-block;
+      transition: transform 0.25s ease;
+    }
+    .tc-toggle[aria-expanded="true"] .tc-icon { transform: rotate(45deg); }
+
+    /* Full-width bio panel — spans all 5 columns */
+    .team-bio-panel {
+      grid-column: 1 / -1;
+      background: var(--white);
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.35s ease;
+      border-top: 2px solid var(--border);
+    }
+    .team-bio-panel.open { grid-template-rows: 1fr; }
+    .team-bio-inner {
+      overflow: hidden;
+    }
+    .team-bio-content {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 48px;
+      padding: 40px 36px;
+      align-items: start;
+    }
+    .team-bio-left .tbl-name {
+      font-family: 'Quattrocento', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--forest);
+      margin-bottom: 6px;
+    }
+    .team-bio-left .tbl-title {
+      font-family: 'Fragment Mono', monospace;
       font-size: 10px;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: var(--tan);
-      margin-bottom: 18px;
-      /* tan on light bg needs slight darkening */
       color: #a07830;
     }
-    .tc-bio {
-      font-size: 13px;
+    .team-bio-right p {
+      font-size: 14px;
       font-weight: 300;
       color: var(--text-muted);
-      line-height: 1.75;
+      line-height: 1.8;
     }
 
     /* ── SUBMIT ─────────────────────────────────────────────── */
@@ -1232,7 +1291,8 @@
       .programs-cards { grid-template-columns: 1fr; }
       .process-steps { grid-template-columns: 1fr 1fr; gap: 40px; }
       .process-steps::before { display: none; }
-      .team-grid { grid-template-columns: 1fr 1fr; }
+      .team-grid { grid-template-columns: repeat(3, 1fr); }
+      .team-bio-content { grid-template-columns: 1fr; gap: 16px; }
       .geo-deals { grid-template-columns: 1fr 1fr; }
       .footer-top { grid-template-columns: 1fr 1fr; }
     }
@@ -1245,7 +1305,7 @@
       .hero-bottom { grid-template-columns: 1fr; padding: 28px 20px 36px; }
       .hero-actions { justify-content: flex-start; }
       .state-grid { grid-template-columns: repeat(5, 1fr); }
-      .team-grid { grid-template-columns: 1fr; }
+      .team-grid { grid-template-columns: 1fr 1fr; }
       .geo-deals { grid-template-columns: 1fr; }
       .process-steps { grid-template-columns: 1fr; }
       .form-row { grid-template-columns: 1fr; }
@@ -1467,19 +1527,19 @@
       </div>
       <div class="step">
         <div class="step-circle">02</div>
-        <h4>Discovery & Term Sheet</h4>
+        <h4>Discovery &amp; Term Sheet</h4>
         <p>A direct call with our team. We issue a same-day Letter of Intent and move quickly into formal underwriting — no committees, no delays.</p>
         <span class="step-time">Day 2 – Day 5</span>
       </div>
       <div class="step">
         <div class="step-circle">03</div>
-        <h4>Underwriting & Due Diligence</h4>
+        <h4>Underwriting &amp; Due Diligence</h4>
         <p>Streamlined internal processes with direct decision-makers. Conviction-based underwriting grounded in operational reality and data-driven risk analysis.</p>
         <span class="step-time">Week 1 – Week 2</span>
       </div>
       <div class="step">
         <div class="step-circle">04</div>
-        <h4>Closing & Funding</h4>
+        <h4>Closing &amp; Funding</h4>
         <p>Acquisition and bridge loans close in 10–30 days. Construction in 30–45 days. Direct access to your lending team throughout servicing.</p>
         <span class="step-time">10 – 45 Days to Fund</span>
       </div>
@@ -1554,29 +1614,50 @@
     </div>
 
     <div class="team-grid">
-      <div class="team-card">
+      <div class="team-card" data-name="Charlie Thomas" data-title="Managing Partner" data-bio="Serial entrepreneur who scaled previous businesses to over $200M annual revenue. Founded Greenlight Energy and PerfX Wireline Services — both acquired. Now provides strategic capital solutions across commercial real estate and private credit.">
         <div class="tc-mono">CT</div>
         <div class="tc-name">Charlie Thomas</div>
         <div class="tc-title">Managing Partner</div>
-        <p class="tc-bio">Serial entrepreneur who scaled previous businesses to over $200M annual revenue. Founded Greenlight Energy and PerfX Wireline Services — both acquired. Now provides strategic capital solutions across commercial real estate and private credit.</p>
+        <button class="tc-toggle" aria-expanded="false">See Bio <span class="tc-icon">+</span></button>
       </div>
-      <div class="team-card">
+      <div class="team-card" data-name="Devin Hunter" data-title="Managing Director" data-bio="Over a decade managing complex asset portfolios. Previously Reserves Director at DJR Energy underwriting $1B in A&amp;D opportunities and $250M annual capital budgets. Combines technical analysis with financial modeling for disciplined underwriting.">
         <div class="tc-mono">DH</div>
         <div class="tc-name">Devin Hunter</div>
         <div class="tc-title">Managing Director</div>
-        <p class="tc-bio">Over a decade managing complex asset portfolios. Previously Reserves Director at DJR Energy underwriting $1B in A&amp;D opportunities and $250M annual capital budgets. Combines technical analysis with financial modeling for disciplined underwriting.</p>
+        <button class="tc-toggle" aria-expanded="false">See Bio <span class="tc-icon">+</span></button>
       </div>
-      <div class="team-card">
+      <div class="team-card" data-name="Eric Thomas" data-title="Director of Originations" data-bio="Nearly nine years in commercial real estate, land, and infrastructure. Previously Managing Director at EOS Land Holdings (2 GW solar capacity) and investment sales at Marcus &amp; Millichap and Taylor Street. Over $100M in total transaction volume.">
         <div class="tc-mono">ET</div>
         <div class="tc-name">Eric Thomas</div>
-        <div class="tc-title">Sr. Business Development</div>
-        <p class="tc-bio">Nearly nine years in commercial real estate, land, and infrastructure. Previously Managing Director at EOS Land Holdings (2 GW solar capacity) and investment sales at Marcus &amp; Millichap and Taylor Street. Over $100M in total transaction volume.</p>
+        <div class="tc-title">Director of Originations</div>
+        <button class="tc-toggle" aria-expanded="false">See Bio <span class="tc-icon">+</span></button>
       </div>
-      <div class="team-card">
+      <div class="team-card" data-name="Griffin Hillier" data-title="Business Development" data-bio="Previously Business Development Executive at EOS Land Holdings, leading outbound prospecting to landowners, brokers, and industry stakeholders across multiple U.S. markets. Focused on deal origination and relationship development.">
         <div class="tc-mono">GH</div>
         <div class="tc-name">Griffin Hillier</div>
         <div class="tc-title">Business Development</div>
-        <p class="tc-bio">Previously Business Development Executive at EOS Land Holdings, leading outbound prospecting to landowners, brokers, and industry stakeholders across multiple U.S. markets. Focused on deal origination and relationship development.</p>
+        <button class="tc-toggle" aria-expanded="false">See Bio <span class="tc-icon">+</span></button>
+      </div>
+      <div class="team-card" data-name="Richie Guerra" data-title="Business Development" data-bio="Nine years of experience spanning commercial real estate and growth-focused industries. Specializes in business development, client relationships, and deal origination — with a track record of building trust across the broker and principal communities through strategic outreach and long-term relationship cultivation.">
+        <div class="tc-mono">RG</div>
+        <div class="tc-name">Richie Guerra</div>
+        <div class="tc-title">Business Development</div>
+        <button class="tc-toggle" aria-expanded="false">See Bio <span class="tc-icon">+</span></button>
+      </div>
+
+      <!-- Full-width bio panel -->
+      <div class="team-bio-panel" id="team-bio-panel">
+        <div class="team-bio-inner">
+          <div class="team-bio-content">
+            <div class="team-bio-left">
+              <div class="tbl-name" id="tbl-name"></div>
+              <div class="tbl-title" id="tbl-title"></div>
+            </div>
+            <div class="team-bio-right">
+              <p id="tbl-bio"></p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1964,6 +2045,40 @@
 </footer>
 
 <script>
+  // Team bio panel
+  const panel     = document.getElementById('team-bio-panel');
+  const tblName   = document.getElementById('tbl-name');
+  const tblTitle  = document.getElementById('tbl-title');
+  const tblBio    = document.getElementById('tbl-bio');
+
+  document.querySelectorAll('.tc-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const card    = btn.closest('.team-card');
+      const already = btn.getAttribute('aria-expanded') === 'true';
+
+      // Reset all cards
+      document.querySelectorAll('.team-card').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.tc-toggle').forEach(b => {
+        b.setAttribute('aria-expanded', 'false');
+        b.querySelector('.tc-icon').textContent = '+';
+      });
+
+      if (already) {
+        // Collapse
+        panel.classList.remove('open');
+      } else {
+        // Populate & open
+        tblName.textContent  = card.dataset.name;
+        tblTitle.textContent = card.dataset.title;
+        tblBio.innerHTML     = card.dataset.bio;
+        panel.classList.add('open');
+        card.classList.add('active');
+        btn.setAttribute('aria-expanded', 'true');
+        btn.querySelector('.tc-icon').textContent = '×';
+      }
+    });
+  });
+
   // Nav scroll shadow
   const nav = document.getElementById('nav');
   window.addEventListener('scroll', () => {
